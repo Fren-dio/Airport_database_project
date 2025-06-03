@@ -1,6 +1,10 @@
 package org.example.MainWindow;
 
+import org.example.Database.AirplaneDatabaseApp;
 import org.example.Database.AirportDatabaseApp;
+import org.example.Database.PassengersDatabaseApp;
+import org.example.Database.ScheduleDatabaseApp;
+import org.example.RequestFrame;
 
 import java.awt.*;
 import java.net.URL;
@@ -9,7 +13,7 @@ import javax.swing.*;
 public class FrameWork extends JFrame {
     private ToolBarMenu toolBarMenu;
     private JScrollPane scrollPane;
-    private JPanel buttonPanel;
+    private JPanel mainPanel;
 
     public FrameWork() {
         super("База данных аэропорта");
@@ -48,145 +52,108 @@ public class FrameWork extends JFrame {
         utilsPanel.add(toolBarMenu);
         getContentPane().add(utilsPanel, "North");
 
-        // Создаем панель с сеткой 2x2
-        buttonPanel = new JPanel(new GridLayout(2, 2));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        // Create main panel with BorderLayout
+        mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        addConnectToAirportBtn();
-        addConnectToAirplaneBtn();
-        addConnectToScheduleBtn();
-        addConnectToPassengersBtn();
+        // Create the 2x2 grid panel for the first four buttons
+        JPanel gridPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        gridPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        this.add(buttonPanel, BorderLayout.CENTER); // Размещаем по центру
+        addConnectToAirportBtn(gridPanel);
+        addConnectToAirplaneBtn(gridPanel);
+        addConnectToScheduleBtn(gridPanel);
+        addConnectToPassengersBtn(gridPanel);
+
+        // Add the grid panel to the center of main panel
+        mainPanel.add(gridPanel, BorderLayout.CENTER);
+
+        // Add the request button at the bottom
+        addRequestBtn(mainPanel);
+
+        this.add(mainPanel, BorderLayout.CENTER);
 
         pack();
         setVisible(true);
     }
 
-    private ImageIcon createScaledIcon(String path, int width, int height) {
-        ImageIcon icon = new ImageIcon(path);
-        Image image = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        return new ImageIcon(image);
-    }
+    void addRequestBtn(JPanel parentPanel) {
+        JButton btn = new JButton("Запросы");
+        btn.setFont(new Font("Arial", Font.BOLD, 16));
+        btn.setPreferredSize(new Dimension(Integer.MAX_VALUE, 60)); // Высота 60px, ширина максимальная
 
-    void addConnectToAirportBtn() {
-        JButton btn = new JButton("Аэропорт");
-        btn.setPreferredSize(new Dimension(200, 200));
-        btn.setVerticalTextPosition(SwingConstants.BOTTOM);
-        btn.setHorizontalTextPosition(SwingConstants.CENTER);
+        // Чтобы кнопка растягивалась по всей ширине
+        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
 
-        // Установка изображения (замените путь на свой)
-        try {
-            URL imageUrl = getClass().getResource("/airport_icon.jpg");
-            if (imageUrl == null) {
-                imageUrl = getClass().getResource("airport_icon.jpg");
-            }
-
-            if (imageUrl != null) {
-                btn.setIcon(new ImageIcon(imageUrl));
-            } else {
-                System.err.println("Изображение не найдено. Используется только текст.");
-            }
-        } catch (Exception e) {
-            System.err.println("Ошибка загрузки изображения: " + e.getMessage());
-        }
-
-        btn.setToolTipText("Получить информацию, связанную с аэропортом");
+        btn.setToolTipText("Выполнить запросы");
         btn.addActionListener(e -> {
             SwingUtilities.invokeLater(() -> {
-                AirportDatabaseApp app = new AirportDatabaseApp();
+                RequestFrame app = new RequestFrame();
                 app.show();
             });
         });
 
-        buttonPanel.add(btn);
+        // Панель для кнопки (чтобы контролировать отступы)
+        JPanel buttonPanel = new JPanel(new BorderLayout());
+        buttonPanel.add(btn, BorderLayout.CENTER);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0)); // Отступ сверху 10px
+
+        parentPanel.add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    void addConnectToAirplaneBtn() {
-        JButton btn = new JButton("Самолеты");
+    void addConnectToAirportBtn(JPanel panel) {
+        JButton btn = createIconButton("Аэропорт", "/airport_icon.jpg",
+                "Получить информацию, связанную с аэропортом",
+                () -> new AirportDatabaseApp().show());
+        panel.add(btn);
+    }
+
+    void addConnectToAirplaneBtn(JPanel panel) {
+        JButton btn = createIconButton("Самолеты", "/airplane_icon.jpg",
+                "Получить информацию, связанную с самолетами",
+                () -> new AirplaneDatabaseApp().show());
+        panel.add(btn);
+    }
+
+    void addConnectToScheduleBtn(JPanel panel) {
+        JButton btn = createIconButton("Расписание", "/schedule_icon.jpg",
+                "Получить информацию, связанную с расписанием полетов",
+                () -> new ScheduleDatabaseApp().show());
+        panel.add(btn);
+    }
+
+    void addConnectToPassengersBtn(JPanel panel) {
+        JButton btn = createIconButton("Пассажиры", "/passengers_icon.jpg",
+                "Получить информацию, связанную с пассажирами",
+                () -> new PassengersDatabaseApp().show());
+        panel.add(btn);
+    }
+
+    private JButton createIconButton(String text, String iconPath, String tooltip, Runnable action) {
+        JButton btn = new JButton(text);
         btn.setPreferredSize(new Dimension(200, 200));
         btn.setVerticalTextPosition(SwingConstants.BOTTOM);
         btn.setHorizontalTextPosition(SwingConstants.CENTER);
 
         try {
-            URL imageUrl = getClass().getResource("/airplane_icon.jpg");
+            URL imageUrl = getClass().getResource(iconPath);
             if (imageUrl == null) {
-                imageUrl = getClass().getResource("airplane_icon.jpg");
+                imageUrl = getClass().getResource(iconPath.substring(1));
             }
 
             if (imageUrl != null) {
                 btn.setIcon(new ImageIcon(imageUrl));
             } else {
-                System.err.println("Изображение не найдено. Используется только текст.");
+                System.err.println("Изображение не найдено: " + iconPath);
             }
         } catch (Exception e) {
             System.err.println("Ошибка загрузки изображения: " + e.getMessage());
         }
 
-        btn.setToolTipText("Получить информацию, связанную с самолетами");
-        btn.addActionListener(e -> {
-            // Действие для кнопки
-        });
+        btn.setToolTipText(tooltip);
+        btn.addActionListener(e -> action.run());
 
-        buttonPanel.add(btn);
-    }
-
-    void addConnectToScheduleBtn() {
-        JButton btn = new JButton("Расписание");
-        btn.setPreferredSize(new Dimension(200, 200));
-        btn.setVerticalTextPosition(SwingConstants.BOTTOM);
-        btn.setHorizontalTextPosition(SwingConstants.CENTER);
-
-        try {
-            URL imageUrl = getClass().getResource("/schedule_icon.jpg");
-            if (imageUrl == null) {
-                imageUrl = getClass().getResource("schedule_icon.jpg");
-            }
-
-            if (imageUrl != null) {
-                btn.setIcon(new ImageIcon(imageUrl));
-            } else {
-                System.err.println("Изображение не найдено. Используется только текст.");
-            }
-        } catch (Exception e) {
-            System.err.println("Ошибка загрузки изображения: " + e.getMessage());
-        }
-
-        btn.setToolTipText("Получить информацию, связанную с расписанием полетов");
-        btn.addActionListener(e -> {
-            // Действие для кнопки
-        });
-
-        buttonPanel.add(btn);
-    }
-
-    void addConnectToPassengersBtn() {
-        JButton btn = new JButton("Пассажиры");
-        btn.setPreferredSize(new Dimension(200, 200));
-        btn.setVerticalTextPosition(SwingConstants.BOTTOM);
-        btn.setHorizontalTextPosition(SwingConstants.CENTER);
-
-        try {
-            URL imageUrl = getClass().getResource("/passengers_icon.jpg");
-            if (imageUrl == null) {
-                imageUrl = getClass().getResource("passengers_icon.jpg");
-            }
-
-            if (imageUrl != null) {
-                btn.setIcon(new ImageIcon(imageUrl));
-            } else {
-                System.err.println("Изображение не найдено. Используется только текст.");
-            }
-        } catch (Exception e) {
-            System.err.println("Ошибка загрузки изображения: " + e.getMessage());
-        }
-
-        btn.setToolTipText("Получить информацию, связанную с пассажирами");
-        btn.addActionListener(e -> {
-            // Действие для кнопки
-        });
-
-        buttonPanel.add(btn);
+        return btn;
     }
 
     private JButton setDimensionBtn(JButton btn, Dimension dim) {
@@ -217,10 +184,7 @@ public class FrameWork extends JFrame {
         aboutMenu.addMenuItem("About", this::showAboutDialog);
 
         MainMenuPanel fileMenu = new MainMenuPanel("File");
-
         fileMenu.addMenuItem("Exit", () -> System.exit(0));
-
-
 
         menuBar.add(aboutMenu);
         menuBar.add(fileMenu);

@@ -76,8 +76,8 @@ public class AirportDatabaseApp {
         );
 
         JPanel group5 = createAlignedGroup("Действия:",
-                createActionButton("Обновить данные", e -> refreshData()),
-                createActionButton("Добавить запись", this::showAddRecordDialog)
+                createActionButton("Добавить запись", this::showAddRecordDialog),
+                createActionButton("Удалить запись", this::showDeleteRecordDialog)
         );
 
         // Добавляем группы с отступами
@@ -98,7 +98,244 @@ public class AirportDatabaseApp {
         frame.add(mainPanel);
     }
 
-    // Новый метод для создания выровненных групп
+    private void showDeleteRecordDialog(ActionEvent e) {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow == -1) {
+            showError("Пожалуйста, выберите запись для удаления");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                frame,
+                "Вы уверены, что хотите удалить выбранную запись?",
+                "Подтверждение удаления",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try {
+            switch (currentTable) {
+                case "AirportStaff":
+                    deleteAirportStaff(selectedRow);
+                    break;
+                case "Departments":
+                    deleteDepartment(selectedRow);
+                    break;
+                case "Teams":
+                    deleteTeam(selectedRow);
+                    break;
+                case "TypeOfAirportStaff":
+                    deleteTypeOfStaff(selectedRow);
+                    break;
+                case "Pylots":
+                    deletePylot(selectedRow);
+                    break;
+                case "Dispatchers":
+                    deleteDispatcher(selectedRow);
+                    break;
+                case "Technics":
+                    deleteTechnic(selectedRow);
+                    break;
+                case "Cashiers":
+                    deleteCashier(selectedRow);
+                    break;
+                case "SecurityStaff":
+                    deleteSecurityStaff(selectedRow);
+                    break;
+                case "HelperDepartment":
+                    deleteHelper(selectedRow);
+                    break;
+                case "TypeOfQualificationLevel":
+                    deleteQualification(selectedRow);
+                    break;
+                case "TypeOfPylotLicense":
+                    deleteLicense(selectedRow);
+                    break;
+                case "ClearanceLevelsList":
+                    deleteClearance(selectedRow);
+                    break;
+                case "Childrens":
+                    deleteChild(selectedRow);
+                    break;
+                case "WorkersAndChildrens":
+                    deleteWorkerChild(selectedRow);
+                    break;
+                case "PylotsAndMedCheckUps":
+                    deleteMedCheckup(selectedRow);
+                    break;
+                default:
+                    showError("Удаление записей из этой таблицы не реализовано");
+            }
+
+            refreshData();
+            JOptionPane.showMessageDialog(frame, "Запись успешно удалена", "Успех", JOptionPane.INFORMATION_MESSAGE);
+        } catch (SQLException ex) {
+            showError("Ошибка при удалении записи: " + ex.getMessage());
+        }
+    }
+
+    // Методы для удаления записей из различных таблиц
+    private void deleteAirportStaff(int selectedRow) throws SQLException {
+        // Получаем ФИО из выбранной строки (первый столбец)
+        String fio = (String) table.getValueAt(selectedRow, 0);
+
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM AirportStaff WHERE WorkerID = " +
+                        "(SELECT WorkerID FROM AirportStaff WHERE FIO = ?)")) {
+            stmt.setString(1, fio);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteDepartment(int selectedRow) throws SQLException {
+        String departmentName = (String) table.getValueAt(selectedRow, 0);
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM Departments WHERE DepartmentName = ?")) {
+            stmt.setString(1, departmentName);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteTeam(int selectedRow) throws SQLException {
+        String teamName = (String) table.getValueAt(selectedRow, 0);
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM Teams WHERE TeamName = ?")) {
+            stmt.setString(1, teamName);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteTypeOfStaff(int selectedRow) throws SQLException {
+        String typeName = (String) table.getValueAt(selectedRow, 0);
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM TypeOfAirportStaff WHERE TypeName = ?")) {
+            stmt.setString(1, typeName);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deletePylot(int selectedRow) throws SQLException {
+        String fio = (String) table.getValueAt(selectedRow, 0);
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM Pylots WHERE WorkerID = (SELECT WorkerID FROM AirportStaff WHERE FIO = ?)")) {
+            stmt.setString(1, fio);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteDispatcher(int selectedRow) throws SQLException {
+        String fio = (String) table.getValueAt(selectedRow, 0);
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM Dispatchers WHERE WorkerID = (SELECT WorkerID FROM AirportStaff WHERE FIO = ?)")) {
+            stmt.setString(1, fio);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteTechnic(int selectedRow) throws SQLException {
+        String fio = (String) table.getValueAt(selectedRow, 0);
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM Technics WHERE WorkerID = (SELECT WorkerID FROM AirportStaff WHERE FIO = ?)")) {
+            stmt.setString(1, fio);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteCashier(int selectedRow) throws SQLException {
+        String fio = (String) table.getValueAt(selectedRow, 0);
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM Cashiers WHERE WorkerID = (SELECT WorkerID FROM AirportStaff WHERE FIO = ?)")) {
+            stmt.setString(1, fio);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteSecurityStaff(int selectedRow) throws SQLException {
+        String fio = (String) table.getValueAt(selectedRow, 0);
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM SecurityStaff WHERE WorkerID = (SELECT WorkerID FROM AirportStaff WHERE FIO = ?)")) {
+            stmt.setString(1, fio);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteHelper(int selectedRow) throws SQLException {
+        String fio = (String) table.getValueAt(selectedRow, 0);
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM HelperDepartment WHERE WorkerID = (SELECT WorkerID FROM AirportStaff WHERE FIO = ?)")) {
+            stmt.setString(1, fio);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteQualification(int selectedRow) throws SQLException {
+        String qualName = (String) table.getValueAt(selectedRow, 0);
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM TypeOfQualificationLevel WHERE name = ?")) {
+            stmt.setString(1, qualName);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteLicense(int selectedRow) throws SQLException {
+        String licenseName = (String) table.getValueAt(selectedRow, 0);
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM TypeOfPylotLicense WHERE name = ?")) {
+            stmt.setString(1, licenseName);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteClearance(int selectedRow) throws SQLException {
+        String levelName = (String) table.getValueAt(selectedRow, 0);
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM ClearanceLevelsList WHERE nameOfLevel = ?")) {
+            stmt.setString(1, levelName);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteChild(int selectedRow) throws SQLException {
+        String childName = (String) table.getValueAt(selectedRow, 0);
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM Childrens WHERE ChildName = ?")) {
+            stmt.setString(1, childName);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteWorkerChild(int selectedRow) throws SQLException {
+        String workerName = (String) table.getValueAt(selectedRow, 0);
+        String childName = (String) table.getValueAt(selectedRow, 1);
+
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM WorkersAndChildrens WHERE " +
+                        "WorkerID = (SELECT WorkerID FROM AirportStaff WHERE FIO = ?) AND " +
+                        "ChildID = (SELECT ChildID FROM Childrens WHERE ChildName = ?)")) {
+            stmt.setString(1, workerName);
+            stmt.setString(2, childName);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void deleteMedCheckup(int selectedRow) throws SQLException {
+        String fio = (String) table.getValueAt(selectedRow, 0);
+        Date checkupDate = (Date) table.getValueAt(selectedRow, 1);
+
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM PylotsAndMedCheckUps WHERE " +
+                        "PylotID = (SELECT WorkerID FROM AirportStaff WHERE FIO = ?) AND " +
+                        "CheckUpDate = ?")) {
+            stmt.setString(1, fio);
+            stmt.setDate(2, checkupDate);
+            stmt.executeUpdate();
+        }
+    }
+
+
+    // метод для создания выровненных групп
     private JPanel createAlignedGroup(String labelText, JComponent... components) {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -116,26 +353,25 @@ public class AirportDatabaseApp {
 
     private JButton createTableButton(String text, String tableName) {
         JButton button = new JButton(text);
+        button.setMinimumSize(new Dimension(180, button.getPreferredSize().height));
+        button.setMaximumSize(new Dimension(180, button.getPreferredSize().height));
+        button.setPreferredSize(new Dimension(180, button.getPreferredSize().height));
         button.addActionListener(e -> showTable(tableName));
         return button;
     }
 
     private JButton createActionButton(String text, ActionListener listener) {
         JButton button = new JButton(text);
+        button.setMinimumSize(new Dimension(180, button.getPreferredSize().height));
+        button.setMaximumSize(new Dimension(180, button.getPreferredSize().height));
+        button.setPreferredSize(new Dimension(180, button.getPreferredSize().height));
         button.addActionListener(listener);
         return button;
     }
 
     private void initDatabase() {
         try {
-            // Регистрация драйвера H2
-            Class.forName("org.h2.Driver");
-
-            // Подключение без авторизации
-            connection = DriverManager.getConnection(
-                    "jdbc:h2:./airportDB;DB_CLOSE_DELAY=-1",
-                    "",
-                    "");
+            connection = DatabaseManager.getConnection();
 
             createTables();
             initializeData();
@@ -152,7 +388,7 @@ public class AirportDatabaseApp {
 
     private void createTables() throws SQLException {
         try (Statement stmt = connection.createStatement()) {
-            // 1. Создаем основные таблицы
+            // 1. Создаем основные таблицы (сначала независимые)
             stmt.execute("CREATE TABLE IF NOT EXISTS TypeOfAirportStaff (" +
                     "IdOfType INT PRIMARY KEY, TypeName VARCHAR(50) NOT NULL)");
 
@@ -161,18 +397,6 @@ public class AirportDatabaseApp {
 
             stmt.execute("CREATE TABLE IF NOT EXISTS Teams (" +
                     "TeamID INT PRIMARY KEY, TeamName VARCHAR(100) NOT NULL)");
-
-            // персонал аэропорта
-            stmt.execute("CREATE TABLE IF NOT EXISTS AirportStaff (" +
-                    "WorkerID INT PRIMARY KEY, " +
-                    "FIO VARCHAR(100) NOT NULL, " +
-                    "DepartID INT REFERENCES Departments(DepartmentID), " +
-                    "WorkerType INT REFERENCES TypeOfAirportStaff(IdOfType), " +
-                    "TeamID INT REFERENCES Teams(TeamID), " +
-                    "Employment DATE, " +
-                    "Gender CHAR(1), " +
-                    "BirthDay DATE, " +
-                    "Salary INT)");
 
             // 2. Создаем справочные таблицы для специализаций
             stmt.execute("CREATE TABLE IF NOT EXISTS TypeOfQualificationLevel (" +
@@ -184,64 +408,72 @@ public class AirportDatabaseApp {
             stmt.execute("CREATE TABLE IF NOT EXISTS ClearanceLevelsList (" +
                     "id INT PRIMARY KEY, nameOfLevel VARCHAR(200) NOT NULL UNIQUE)");
 
-            // 3. Создаем таблицы для специализаций сотрудников
+            // 3. Основная таблица сотрудников (теперь без CASCADE для Teams)
+            stmt.execute("CREATE TABLE IF NOT EXISTS AirportStaff (" +
+                    "WorkerID INT PRIMARY KEY, " +
+                    "FIO VARCHAR(100) NOT NULL, " +
+                    "DepartID INT REFERENCES Departments(DepartmentID) ON DELETE SET NULL, " +
+                    "WorkerType INT REFERENCES TypeOfAirportStaff(IdOfType) ON DELETE SET NULL, " +
+                    "TeamID INT REFERENCES Teams(TeamID) ON DELETE SET NULL, " +
+                    "Employment DATE, " +
+                    "Gender CHAR(1), " +
+                    "BirthDay DATE, " +
+                    "Salary INT)");
 
-            // 3.1 Пилоты
+            // 4. Таблицы специализаций сотрудников (CASCADE только в одну сторону)
             stmt.execute("CREATE TABLE IF NOT EXISTS Pylots (" +
-                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID), " +
+                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
                     "MedCheckUp CHAR(1) DEFAULT 'N', " +
-                    "PylotLicense INT REFERENCES TypeOfPylotLicense(id), " +
+                    "PylotLicense INT REFERENCES TypeOfPylotLicense(id) ON DELETE SET NULL, " +
                     "FlightHours INT, " +
-                    "Qualification_Level INT REFERENCES TypeOfQualificationLevel(id))");
+                    "Qualification_Level INT REFERENCES TypeOfQualificationLevel(id) ON DELETE SET NULL)");
 
             stmt.execute("CREATE TABLE IF NOT EXISTS PylotsAndMedCheckUps (" +
-                    "PylotID INT REFERENCES Pylots(WorkerID), " +
+                    "PylotID INT REFERENCES Pylots(WorkerID) ON DELETE CASCADE, " +
                     "CheckUpDate TIMESTAMP, " +
                     "Passed CHAR(1) DEFAULT 'N', " +
                     "PRIMARY KEY (PylotID, CheckUpDate))");
 
-            // 3.2 Диспетчеры
             stmt.execute("CREATE TABLE IF NOT EXISTS Dispatchers (" +
-                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID), " +
-                    "ClearanceLevel INT REFERENCES ClearanceLevelsList(id))");
+                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
+                    "ClearanceLevel INT REFERENCES ClearanceLevelsList(id) ON DELETE SET NULL)");
 
-            // 3.3 Техники
             stmt.execute("CREATE TABLE IF NOT EXISTS Technics (" +
-                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID), " +
-                    "ClearanceLevel INT REFERENCES ClearanceLevelsList(id), " +
+                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
+                    "ClearanceLevel INT REFERENCES ClearanceLevelsList(id) ON DELETE SET NULL, " +
                     "Specialization VARCHAR(400))");
 
-            // 3.4 Кассиры
             stmt.execute("CREATE TABLE IF NOT EXISTS Cashiers (" +
-                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID), " +
+                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
                     "CustomerServiceExperience CHAR(1) DEFAULT 'N', " +
                     "PaymentProcessingSkills CHAR(1) DEFAULT 'N', " +
                     "BookingSystemKnowledge CHAR(1) DEFAULT 'N')");
 
-            // 3.5 Служба безопасности
             stmt.execute("CREATE TABLE IF NOT EXISTS SecurityStaff (" +
-                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID), " +
-                    "ClearanceLevel INT REFERENCES ClearanceLevelsList(id), " +
+                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
+                    "ClearanceLevel INT REFERENCES ClearanceLevelsList(id) ON DELETE SET NULL, " +
                     "EmergencyResponseSkills CHAR(1) DEFAULT 'N', " +
                     "CCTVExperience CHAR(1) DEFAULT 'N', " +
                     "InspectionSkills CHAR(1) DEFAULT 'N')");
 
-            // 3.6 Справочная служба
             stmt.execute("CREATE TABLE IF NOT EXISTS HelperDepartment (" +
-                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID), " +
+                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
                     "SchedulingSkills CHAR(1) DEFAULT 'N', " +
                     "HRProcessesKnowledge CHAR(1) DEFAULT 'N')");
 
-            // 4. Создаем таблицы для детей сотрудников
+            // 5. Таблицы для детей сотрудников
             stmt.execute("CREATE TABLE IF NOT EXISTS Childrens (" +
                     "ChildID INT PRIMARY KEY, ChildName VARCHAR(100) NOT NULL, ChildBirthDay DATE)");
 
             stmt.execute("CREATE TABLE IF NOT EXISTS WorkersAndChildrens (" +
-                    "WorkerID INT REFERENCES AirportStaff(WorkerID), " +
-                    "ChildID INT REFERENCES Childrens(ChildID), " +
+                    "WorkerID INT REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
+                    "ChildID INT REFERENCES Childrens(ChildID) ON DELETE CASCADE, " +
                     "PRIMARY KEY (WorkerID, ChildID))");
         }
     }
+
+
+
 
 
     private void initializeData() throws SQLException {
@@ -259,11 +491,12 @@ public class AirportDatabaseApp {
 
     private void insertTestData() throws SQLException {
         try (Statement stmt = connection.createStatement()) {
-            // 1. Заполняем справочники
+            // 1. Заполняем справочники типов сотрудников
             stmt.execute("INSERT INTO TypeOfAirportStaff VALUES " +
                     "(1,'Пилот'),(2,'Диспетчер'),(3,'Техник'),(4,'Кассир')," +
                     "(5,'Сотрудник безопасности'),(6,'Сотрудник справочной')");
 
+            // 2. Заполняем справочники квалификаций и лицензий
             stmt.execute("INSERT INTO TypeOfQualificationLevel VALUES " +
                     "(1,'Junior'),(2,'Middle'),(3,'Senior'),(4,'Lead'),(5,'Expert')");
 
@@ -274,21 +507,22 @@ public class AirportDatabaseApp {
             stmt.execute("INSERT INTO ClearanceLevelsList VALUES " +
                     "(1,'Базовый'),(2,'Средний'),(3,'Высокий'),(4,'Максимальный')");
 
-            // 2. Заполняем отделы
+            // 3. Заполняем отделы
             stmt.execute("INSERT INTO Departments VALUES " +
                     "(1,'Летный отдел','Терминал A, 2 этаж')," +
                     "(2,'Диспетчерская служба','Башня управления')," +
                     "(3,'Техническая служба','Ангар 1')," +
                     "(4,'Кассы и регистрация','Терминал B, 1 этаж')," +
-                    "(5,'Служба безопасности','Терминал C, КПП')");
+                    "(5,'Служба безопасности','Терминал C, КПП')," +
+                    "(6,'Справочная служба','Терминал A, 1 этаж')");
 
-            // 3. Заполняем команды
+            // 4. Заполняем команды
             stmt.execute("INSERT INTO Teams VALUES " +
-                    "(1,'Экипаж 101',1),(2,'Экипаж 202',3),(3,'Диспетчеры смены A',5)," +
-                    "(4,'Техническая бригада 1',7),(5,'Кассиры утренней смены',9)," +
-                    "(6,'Охрана терминала B',11)");
+                    "(1,'Экипаж 101'),(2,'Экипаж 202'),(3,'Диспетчеры смены A')," +
+                    "(4,'Техническая бригада 1'),(5,'Кассиры утренней смены')," +
+                    "(6,'Охрана терминала B'),(7,'Справочная смена 1')");
 
-            // 4. Заполняем основных сотрудников
+            // 5. Заполняем основных сотрудников
             stmt.execute("INSERT INTO AirportStaff VALUES " +
                     // Пилоты
                     "(1,'Иванов Иван Иванович',1,1,1,'2015-06-15','M','1980-05-10',250000)," +
@@ -307,9 +541,10 @@ public class AirportDatabaseApp {
                     "(10,'Алексеев Сергей Владимирович',5,5,6,'2017-02-15','M','1989-06-12',100000)," +
                     "(11,'Дмитриева Татьяна Николаевна',5,5,6,'2018-11-28','F','1990-10-05',105000)," +
                     // Справочная
-                    "(12,'Павлова Виктория Сергеевна',4,6,5,'2019-08-15','F','1995-01-30',85000)");
+                    "(12,'Павлова Виктория Сергеевна',6,6,7,'2019-08-15','F','1995-01-30',85000)," +
+                    "(13,'Козлов Артем Игоревич',6,6,7,'2020-03-10','M','1996-07-22',88000)");
 
-            // 5. Заполняем специализированные таблицы
+            // 6. Заполняем специализированные таблицы
             // Пилоты
             stmt.execute("INSERT INTO Pylots VALUES " +
                     "(1,'Y',3,4500,4)," +
@@ -320,7 +555,7 @@ public class AirportDatabaseApp {
             stmt.execute("INSERT INTO PylotsAndMedCheckUps VALUES " +
                     "(1,'2023-01-15','Y'),(1,'2023-07-15','Y')," +
                     "(2,'2023-02-20','Y'),(2,'2023-08-20','N')," +
-                    "(3,'2023-03-10','Y')");
+                    "(3,'2023-03-10','Y'),(3,'2023-09-10','Y')");
 
             // Диспетчеры
             stmt.execute("INSERT INTO Dispatchers VALUES " +
@@ -340,19 +575,20 @@ public class AirportDatabaseApp {
 
             // Справочная
             stmt.execute("INSERT INTO HelperDepartment VALUES " +
-                    "(12,'Y','N')");
+                    "(12,'Y','N'),(13,'N','Y')");
 
-            // 6. Заполняем данные о детях
+            // 7. Заполняем данные о детях
             stmt.execute("INSERT INTO Childrens VALUES " +
                     "(1,'Иванов Алексей Иванович','2010-05-15')," +
                     "(2,'Иванова София Ивановна','2015-08-22')," +
                     "(3,'Петрова Дарья Петровна','2018-03-10')," +
                     "(4,'Сидоров Максим Александрович','2016-11-28')," +
-                    "(5,'Кузнецова Алиса Алексеевна','2019-07-03')");
+                    "(5,'Кузнецова Алиса Алексеевна','2019-07-03')," +
+                    "(6,'Павлов Денис Викторович','2017-05-18')");
 
-            // 7. Связи сотрудник-ребенок
+            // 8. Связи сотрудник-ребенок
             stmt.execute("INSERT INTO WorkersAndChildrens VALUES " +
-                    "(1,1),(1,2),(3,4),(4,5),(8,3)");
+                    "(1,1),(1,2),(3,4),(4,5),(8,3),(12,6)");
         }
     }
 
@@ -383,34 +619,364 @@ public class AirportDatabaseApp {
     }
 
     private void showAddLicenseDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JTextField nameField = new JTextField();
+
+        panel.add(new JLabel("Название лицензии:"));
+        panel.add(nameField);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить тип лицензии",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (nameField.getText().isEmpty() || nameField.getText().isEmpty()) {
+                    throw new Exception("ID и название лицензии обязательны для заполнения");
+                }
+                int nextId = getNextId("Teams", "TeamID");
+
+                String sql = "INSERT INTO TypeOfPylotLicense VALUES (?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    stmt.setInt(1, nextId);
+                    stmt.setString(2, nameField.getText());
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении типа лицензии: " + ex.getMessage());
+            }
+        }
     }
 
     private void showAddClearanceDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JTextField nameField = new JTextField();
+
+        panel.add(new JLabel("Название уровня:"));
+        panel.add(nameField);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить уровень допуска",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (nameField.getText().isEmpty()) {
+                    throw new Exception("ID и название уровня обязательны для заполнения");
+                }
+                int nextId = getNextId("Teams", "TeamID");
+
+                String sql = "INSERT INTO ClearanceLevelsList VALUES (?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    stmt.setInt(1, nextId);
+                    stmt.setString(2, nameField.getText());
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении уровня допуска: " + ex.getMessage());
+            }
+        }
     }
 
     private void showAddChildDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JTextField nameField = new JTextField();
+        JTextField birthDayField = new JTextField();
+
+        birthDayField.setToolTipText("Формат: YYYY-MM-DD");
+
+        panel.add(new JLabel("Имя ребенка:"));
+        panel.add(nameField);
+        panel.add(new JLabel("Дата рождения (YYYY-MM-DD):"));
+        panel.add(birthDayField);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить ребенка",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (nameField.getText().isEmpty() || birthDayField.getText().isEmpty()) {
+                    throw new Exception("Все поля обязательны для заполнения");
+                }
+                int nextId = getNextId("Teams", "TeamID");
+
+                String sql = "INSERT INTO Childrens VALUES (?, ?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    stmt.setInt(1, nextId);
+                    stmt.setString(2, nameField.getText());
+                    stmt.setDate(3, Date.valueOf(birthDayField.getText()));
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении ребенка: " + ex.getMessage());
+            }
+        }
     }
 
     private void showAddQualificationDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JTextField nameField = new JTextField();
+
+        panel.add(new JLabel("Название уровня:"));
+        panel.add(nameField);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить уровень квалификации",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (nameField.getText().isEmpty()) {
+                    throw new Exception("ID и название уровня обязательны для заполнения");
+                }
+                int nextId = getNextId("Teams", "TeamID");
+
+                String sql = "INSERT INTO TypeOfQualificationLevel VALUES (?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    stmt.setInt(1, nextId);
+                    stmt.setString(2, nameField.getText());
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении уровня квалификации: " + ex.getMessage());
+            }
+        }
     }
 
     private void showAddPylotDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Выпадающий список для WorkerID
+        JComboBox<String> workerCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT WorkerID, FIO FROM AirportStaff WHERE WorkerType = 1")) {
+            while (rs.next()) {
+                workerCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки пилотов: " + ex.getMessage());
+        }
+
+        JCheckBox medCheckBox = new JCheckBox("Прошел медосмотр");
+
+        // Выпадающий список для лицензии
+        JComboBox<String> licenseCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT id, name FROM TypeOfPylotLicense")) {
+            while (rs.next()) {
+                licenseCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки типов лицензий: " + ex.getMessage());
+        }
+
+        JTextField flightHoursField = new JTextField();
+
+        // Выпадающий список для уровня квалификации
+        JComboBox<String> qualCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT id, name FROM TypeOfQualificationLevel")) {
+            while (rs.next()) {
+                qualCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки уровней квалификации: " + ex.getMessage());
+        }
+
+        panel.add(new JLabel("Сотрудник:"));
+        panel.add(workerCombo);
+        panel.add(new JLabel("Медосмотр:"));
+        panel.add(medCheckBox);
+        panel.add(new JLabel("Лицензия:"));
+        panel.add(licenseCombo);
+        panel.add(new JLabel("Налёт часов:"));
+        panel.add(flightHoursField);
+        panel.add(new JLabel("Уровень квалификации:"));
+        panel.add(qualCombo);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить пилота",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (workerCombo.getSelectedItem() == null || flightHoursField.getText().isEmpty()) {
+                    throw new Exception("Не все обязательные поля заполнены");
+                }
+
+                String sql = "INSERT INTO Pylots VALUES (?, ?, ?, ?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    // Извлекаем ID из выбранного значения комбобокса
+                    String selectedWorker = (String) workerCombo.getSelectedItem();
+                    int workerId = selectedWorker != null ?
+                            Integer.parseInt(selectedWorker.split(" - ")[0]) : 0;
+                    stmt.setInt(1, workerId);
+
+                    stmt.setString(2, medCheckBox.isSelected() ? "Y" : "N");
+
+                    String selectedLicense = (String) licenseCombo.getSelectedItem();
+                    int licenseId = selectedLicense != null ?
+                            Integer.parseInt(selectedLicense.split(" - ")[0]) : 0;
+                    stmt.setInt(3, licenseId);
+
+                    stmt.setInt(4, Integer.parseInt(flightHoursField.getText()));
+
+                    String selectedQual = (String) qualCombo.getSelectedItem();
+                    int qualId = selectedQual != null ?
+                            Integer.parseInt(selectedQual.split(" - ")[0]) : 0;
+                    stmt.setInt(5, qualId);
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении пилота: " + ex.getMessage());
+            }
+        }
     }
 
     private void showAddTypeDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JTextField nameField = new JTextField();
+
+        panel.add(new JLabel("Название типа:"));
+        panel.add(nameField);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить тип сотрудника",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (nameField.getText().isEmpty()) {
+                    throw new Exception("ID и название типа обязательны для заполнения");
+                }
+                int nextId = getNextId("Teams", "TeamID");
+
+                String sql = "INSERT INTO TypeOfAirportStaff VALUES (?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    stmt.setInt(1, nextId);
+                    stmt.setString(2, nameField.getText());
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении типа сотрудника: " + ex.getMessage());
+            }
+        }
     }
 
     private void showAddTeamDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JTextField nameField = new JTextField();
+
+        panel.add(new JLabel("Название бригады:"));
+        panel.add(nameField);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить бригаду",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (nameField.getText().isEmpty() || nameField.getText().isEmpty()) {
+                    throw new Exception("ID и название бригады обязательны для заполнения");
+                }
+
+                int nextId = getNextId("Teams", "TeamID");
+
+                String sql = "INSERT INTO Teams VALUES (?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    stmt.setInt(1, nextId);
+                    stmt.setString(2, nameField.getText());
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении бригады: " + ex.getMessage());
+            }
+        }
     }
 
     private void showAddDepartmentDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JTextField nameField = new JTextField();
+        JTextField locationField = new JTextField();
+
+        panel.add(new JLabel("Название отдела:"));
+        panel.add(nameField);
+        panel.add(new JLabel("Местоположение:"));
+        panel.add(locationField);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить отдел",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (nameField.getText().isEmpty()) {
+                    throw new Exception("Название отдела обязательно для заполнения");
+                }
+
+                // Get next available ID
+                int nextId = getNextId("Departments", "DepartmentID");
+
+                String sql = "INSERT INTO Departments VALUES (?, ?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    stmt.setInt(1, nextId);
+                    stmt.setString(2, nameField.getText());
+                    stmt.setString(3, locationField.getText().isEmpty() ? null : locationField.getText());
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении отдела: " + ex.getMessage());
+            }
+        }
+    }
+
+    // Helper method to get next available ID
+    private int getNextId(String tableName, String idColumn) throws SQLException {
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT MAX(" + idColumn + ") FROM " + tableName)) {
+            if (rs.next()) {
+                return rs.getInt(1) + 1;
+            }
+            return 1; // if table is empty
+        }
     }
 
     private void showAddStaffDialog() {
         JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JTextField workerIdField = new JTextField();
         JTextField fioField = new JTextField();
 
         // Выпадающий список для DepartID
@@ -455,8 +1021,6 @@ public class AirportDatabaseApp {
         employmentField.setToolTipText("Формат: YYYY-MM-DD");
         birthDayField.setToolTipText("Формат: YYYY-MM-DD");
 
-        panel.add(new JLabel("WorkerID:"));
-        panel.add(workerIdField);
         panel.add(new JLabel("ФИО:"));
         panel.add(fioField);
         panel.add(new JLabel("Отдел:"));
@@ -481,15 +1045,16 @@ public class AirportDatabaseApp {
         if (result == JOptionPane.OK_OPTION) {
             try {
                 // Проверка обязательных полей
-                if (workerIdField.getText().isEmpty() || fioField.getText().isEmpty() ||
+                if (fioField.getText().isEmpty() ||
                         employmentField.getText().isEmpty() || birthDayField.getText().isEmpty() ||
                         salaryField.getText().isEmpty()) {
                     throw new Exception("Все обязательные поля должны быть заполнены");
                 }
+                int nextId = getNextId("Teams", "TeamID");
 
                 String sql = "INSERT INTO AirportStaff VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                    stmt.setInt(1, Integer.parseInt(workerIdField.getText()));
+                    stmt.setInt(1, nextId);
                     stmt.setString(2, fioField.getText());
 
                     // Извлекаем ID из выбранного значения комбобокса
@@ -523,23 +1088,348 @@ public class AirportDatabaseApp {
     }
 
     private void showAddTechnicDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Выпадающий список для WorkerID
+        JComboBox<String> workerCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT WorkerID, FIO FROM AirportStaff WHERE WorkerType = 3")) {
+            while (rs.next()) {
+                workerCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки техников: " + ex.getMessage());
+        }
+
+        // Выпадающий список для уровня допуска
+        JComboBox<String> clearanceCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT id, nameOfLevel FROM ClearanceLevelsList")) {
+            while (rs.next()) {
+                clearanceCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки уровней допуска: " + ex.getMessage());
+        }
+
+        JTextField specializationField = new JTextField();
+
+        panel.add(new JLabel("Сотрудник:"));
+        panel.add(workerCombo);
+        panel.add(new JLabel("Уровень допуска:"));
+        panel.add(clearanceCombo);
+        panel.add(new JLabel("Специализация:"));
+        panel.add(specializationField);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить техника",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (workerCombo.getSelectedItem() == null) {
+                    throw new Exception("Не выбран сотрудник");
+                }
+
+                String sql = "INSERT INTO Technics VALUES (?, ?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    // Извлекаем ID из выбранного значения комбобокса
+                    String selectedWorker = (String) workerCombo.getSelectedItem();
+                    int workerId = selectedWorker != null ?
+                            Integer.parseInt(selectedWorker.split(" - ")[0]) : 0;
+                    stmt.setInt(1, workerId);
+
+                    String selectedClearance = (String) clearanceCombo.getSelectedItem();
+                    int clearanceId = selectedClearance != null ?
+                            Integer.parseInt(selectedClearance.split(" - ")[0]) : 0;
+                    stmt.setInt(2, clearanceId);
+
+                    stmt.setString(3, specializationField.getText().isEmpty() ? null : specializationField.getText());
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении техника: " + ex.getMessage());
+            }
+        }
     }
 
     private void showAddCashierDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Выпадающий список для WorkerID
+        JComboBox<String> workerCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT WorkerID, FIO FROM AirportStaff WHERE WorkerType = 4")) {
+            while (rs.next()) {
+                workerCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки кассиров: " + ex.getMessage());
+        }
+
+        JCheckBox customerServiceCheck = new JCheckBox("Опыт обслуживания");
+        JCheckBox paymentSkillsCheck = new JCheckBox("Навыки оплаты");
+        JCheckBox bookingKnowledgeCheck = new JCheckBox("Знание системы бронирования");
+
+        panel.add(new JLabel("Сотрудник:"));
+        panel.add(workerCombo);
+        panel.add(new JLabel("Опыт обслуживания:"));
+        panel.add(customerServiceCheck);
+        panel.add(new JLabel("Навыки оплаты:"));
+        panel.add(paymentSkillsCheck);
+        panel.add(new JLabel("Знание системы:"));
+        panel.add(bookingKnowledgeCheck);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить кассира",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (workerCombo.getSelectedItem() == null) {
+                    throw new Exception("Не выбран сотрудник");
+                }
+
+                String sql = "INSERT INTO Cashiers VALUES (?, ?, ?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    // Извлекаем ID из выбранного значения комбобокса
+                    String selectedWorker = (String) workerCombo.getSelectedItem();
+                    int workerId = selectedWorker != null ?
+                            Integer.parseInt(selectedWorker.split(" - ")[0]) : 0;
+                    stmt.setInt(1, workerId);
+
+                    stmt.setString(2, customerServiceCheck.isSelected() ? "Y" : "N");
+                    stmt.setString(3, paymentSkillsCheck.isSelected() ? "Y" : "N");
+                    stmt.setString(4, bookingKnowledgeCheck.isSelected() ? "Y" : "N");
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении кассира: " + ex.getMessage());
+            }
+        }
     }
 
     private void showAddSecurityStaffDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Выпадающий список для WorkerID
+        JComboBox<String> workerCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT WorkerID, FIO FROM AirportStaff WHERE WorkerType = 5")) {
+            while (rs.next()) {
+                workerCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки сотрудников охраны: " + ex.getMessage());
+        }
+
+        // Выпадающий список для уровня допуска
+        JComboBox<String> clearanceCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT id, nameOfLevel FROM ClearanceLevelsList")) {
+            while (rs.next()) {
+                clearanceCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки уровней допуска: " + ex.getMessage());
+        }
+
+        JCheckBox emergencyCheck = new JCheckBox("Навыки ЧС");
+        JCheckBox cctvCheck = new JCheckBox("Опыт с CCTV");
+        JCheckBox inspectionCheck = new JCheckBox("Навыки досмотра");
+
+        panel.add(new JLabel("Сотрудник:"));
+        panel.add(workerCombo);
+        panel.add(new JLabel("Уровень допуска:"));
+        panel.add(clearanceCombo);
+        panel.add(new JLabel("Навыки ЧС:"));
+        panel.add(emergencyCheck);
+        panel.add(new JLabel("Опыт с CCTV:"));
+        panel.add(cctvCheck);
+        panel.add(new JLabel("Навыки досмотра:"));
+        panel.add(inspectionCheck);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить сотрудника охраны",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (workerCombo.getSelectedItem() == null) {
+                    throw new Exception("Не выбран сотрудник");
+                }
+
+                String sql = "INSERT INTO SecurityStaff VALUES (?, ?, ?, ?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    // Извлекаем ID из выбранного значения комбобокса
+                    String selectedWorker = (String) workerCombo.getSelectedItem();
+                    int workerId = selectedWorker != null ?
+                            Integer.parseInt(selectedWorker.split(" - ")[0]) : 0;
+                    stmt.setInt(1, workerId);
+
+                    String selectedClearance = (String) clearanceCombo.getSelectedItem();
+                    int clearanceId = selectedClearance != null ?
+                            Integer.parseInt(selectedClearance.split(" - ")[0]) : 0;
+                    stmt.setInt(2, clearanceId);
+
+                    stmt.setString(3, emergencyCheck.isSelected() ? "Y" : "N");
+                    stmt.setString(4, cctvCheck.isSelected() ? "Y" : "N");
+                    stmt.setString(5, inspectionCheck.isSelected() ? "Y" : "N");
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении сотрудника охраны: " + ex.getMessage());
+            }
+        }
     }
 
     private void showAddHelperDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Выпадающий список для WorkerID
+        JComboBox<String> workerCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT WorkerID, FIO FROM AirportStaff WHERE WorkerType = 5")) {
+            while (rs.next()) {
+                workerCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки сотрудников охраны: " + ex.getMessage());
+        }
+
+        // Выпадающий список для уровня допуска
+        JComboBox<String> clearanceCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT id, nameOfLevel FROM ClearanceLevelsList")) {
+            while (rs.next()) {
+                clearanceCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки уровней допуска: " + ex.getMessage());
+        }
+
+        JCheckBox emergencyCheck = new JCheckBox("Навыки ЧС");
+        JCheckBox cctvCheck = new JCheckBox("Опыт с CCTV");
+        JCheckBox inspectionCheck = new JCheckBox("Навыки досмотра");
+
+        panel.add(new JLabel("Сотрудник:"));
+        panel.add(workerCombo);
+        panel.add(new JLabel("Уровень допуска:"));
+        panel.add(clearanceCombo);
+        panel.add(new JLabel("Навыки ЧС:"));
+        panel.add(emergencyCheck);
+        panel.add(new JLabel("Опыт с CCTV:"));
+        panel.add(cctvCheck);
+        panel.add(new JLabel("Навыки досмотра:"));
+        panel.add(inspectionCheck);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить сотрудника охраны",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (workerCombo.getSelectedItem() == null) {
+                    throw new Exception("Не выбран сотрудник");
+                }
+
+                String sql = "INSERT INTO SecurityStaff VALUES (?, ?, ?, ?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    // Извлекаем ID из выбранного значения комбобокса
+                    String selectedWorker = (String) workerCombo.getSelectedItem();
+                    int workerId = selectedWorker != null ?
+                            Integer.parseInt(selectedWorker.split(" - ")[0]) : 0;
+                    stmt.setInt(1, workerId);
+
+                    String selectedClearance = (String) clearanceCombo.getSelectedItem();
+                    int clearanceId = selectedClearance != null ?
+                            Integer.parseInt(selectedClearance.split(" - ")[0]) : 0;
+                    stmt.setInt(2, clearanceId);
+
+                    stmt.setString(3, emergencyCheck.isSelected() ? "Y" : "N");
+                    stmt.setString(4, cctvCheck.isSelected() ? "Y" : "N");
+                    stmt.setString(5, inspectionCheck.isSelected() ? "Y" : "N");
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении сотрудника охраны: " + ex.getMessage());
+            }
+        }
     }
 
     private void showAddDispatcherDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Выпадающий список для WorkerID
+        JComboBox<String> workerCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT WorkerID, FIO FROM AirportStaff WHERE WorkerType = 2")) {
+            while (rs.next()) {
+                workerCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки диспетчеров: " + ex.getMessage());
+        }
+
+        // Выпадающий список для уровня допуска
+        JComboBox<String> clearanceCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT id, nameOfLevel FROM ClearanceLevelsList")) {
+            while (rs.next()) {
+                clearanceCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки уровней допуска: " + ex.getMessage());
+        }
+
+        panel.add(new JLabel("Сотрудник:"));
+        panel.add(workerCombo);
+        panel.add(new JLabel("Уровень допуска:"));
+        panel.add(clearanceCombo);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить диспетчера",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (workerCombo.getSelectedItem() == null) {
+                    throw new Exception("Не выбран сотрудник");
+                }
+
+                String sql = "INSERT INTO Dispatchers VALUES (?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    // Извлекаем ID из выбранного значения комбобокса
+                    String selectedWorker = (String) workerCombo.getSelectedItem();
+                    int workerId = selectedWorker != null ?
+                            Integer.parseInt(selectedWorker.split(" - ")[0]) : 0;
+                    stmt.setInt(1, workerId);
+
+                    String selectedClearance = (String) clearanceCombo.getSelectedItem();
+                    int clearanceId = selectedClearance != null ?
+                            Integer.parseInt(selectedClearance.split(" - ")[0]) : 0;
+                    stmt.setInt(2, clearanceId);
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении диспетчера: " + ex.getMessage());
+            }
+        }
     }
 
     private void showAddMedCheckupDialog() {
@@ -547,7 +1437,66 @@ public class AirportDatabaseApp {
     }
 
     private void showAddWorkerChildDialog() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Выпадающий список для WorkerID
+        JComboBox<String> workerCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT WorkerID, FIO FROM AirportStaff")) {
+            while (rs.next()) {
+                workerCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки сотрудников: " + ex.getMessage());
+        }
+
+        // Выпадающий список для ChildID
+        JComboBox<String> childCombo = new JComboBox<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT ChildID, ChildName FROM Childrens")) {
+            while (rs.next()) {
+                childCombo.addItem(rs.getInt(1) + " - " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            showError("Ошибка загрузки детей: " + ex.getMessage());
+        }
+
+        panel.add(new JLabel("Сотрудник:"));
+        panel.add(workerCombo);
+        panel.add(new JLabel("Ребенок:"));
+        panel.add(childCombo);
+
+        int result = JOptionPane.showConfirmDialog(
+                frame, panel, "Добавить связь сотрудник-ребенок",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                if (workerCombo.getSelectedItem() == null || childCombo.getSelectedItem() == null) {
+                    throw new Exception("Не выбраны сотрудник и/или ребенок");
+                }
+
+                String sql = "INSERT INTO WorkersAndChildrens VALUES (?, ?)";
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    // Извлекаем ID из выбранного значения комбобокса
+                    String selectedWorker = (String) workerCombo.getSelectedItem();
+                    int workerId = selectedWorker != null ?
+                            Integer.parseInt(selectedWorker.split(" - ")[0]) : 0;
+                    stmt.setInt(1, workerId);
+
+                    String selectedChild = (String) childCombo.getSelectedItem();
+                    int childId = selectedChild != null ?
+                            Integer.parseInt(selectedChild.split(" - ")[0]) : 0;
+                    stmt.setInt(2, childId);
+
+                    stmt.executeUpdate();
+                    refreshData();
+                }
+            } catch (Exception ex) {
+                showError("Ошибка при добавлении связи: " + ex.getMessage());
+            }
+        }
     }
 
 
@@ -595,7 +1544,7 @@ public class AirportDatabaseApp {
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
             };
 
@@ -648,7 +1597,7 @@ public class AirportDatabaseApp {
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -692,11 +1641,21 @@ public class AirportDatabaseApp {
             sorter.setComparator(4, String.CASE_INSENSITIVE_ORDER); // Квалификация
 
             // Настраиваем ширину столбцов
-            table.getColumnModel().getColumn(0).setPreferredWidth(200); // ФИО
+            table.getColumnModel().getColumn(0).setPreferredWidth(300); // ФИО
+            table.getColumnModel().getColumn(0).setMinWidth(300);
+            table.getColumnModel().getColumn(0).setMaxWidth(300);
             table.getColumnModel().getColumn(1).setPreferredWidth(120);  // Медосмотр
+            table.getColumnModel().getColumn(1).setMinWidth(120);
+            table.getColumnModel().getColumn(1).setMaxWidth(120);
             table.getColumnModel().getColumn(2).setPreferredWidth(150);  // Лицензия
+            table.getColumnModel().getColumn(2).setMinWidth(150);
+            table.getColumnModel().getColumn(2).setMaxWidth(150);
             table.getColumnModel().getColumn(3).setPreferredWidth(80);   // Часы
+            table.getColumnModel().getColumn(3).setMinWidth(80);
+            table.getColumnModel().getColumn(3).setMaxWidth(80);
             table.getColumnModel().getColumn(4).setPreferredWidth(150);  // Квалификация
+            table.getColumnModel().getColumn(4).setMinWidth(150);
+            table.getColumnModel().getColumn(4).setMaxWidth(150);
 
             // Общие настройки таблицы
             table.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -713,30 +1672,49 @@ public class AirportDatabaseApp {
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT id, name FROM TypeOfQualificationLevel ORDER BY id")) {
 
+            // Создаем модель таблицы
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
 
                 @Override
                 public Class<?> getColumnClass(int columnIndex) {
-                    return columnIndex == 0 ? Integer.class : String.class;
+                    switch (columnIndex) {
+                        case 0: return Integer.class; // ID
+                        default: return String.class; // Название
+                    }
                 }
             };
 
-            model.addColumn("ID");
+            // Добавляем столбцы
             model.addColumn("Уровень квалификации");
 
+            // Заполняем данными
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("id"),
                         rs.getString("name")
                 });
             }
 
             table.setModel(model);
-            configureTable();
+
+            // Настраиваем сортировку
+            TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+            table.setRowSorter(sorter);
+
+            // Настраиваем ширину столбцов
+            table.getColumnModel().getColumn(0).setPreferredWidth(200);  // Название
+            table.getColumnModel().getColumn(0).setMinWidth(200);
+            table.getColumnModel().getColumn(0).setMaxWidth(200);
+
+            // Общие настройки таблицы
+            table.setFont(new Font("Arial", Font.PLAIN, 14));
+            table.setRowHeight(25);
+            table.getTableHeader().setReorderingAllowed(false);
+            table.setAutoCreateRowSorter(true);
+
         } catch (SQLException e) {
             showError("Ошибка загрузки уровней квалификации: " + e.getMessage());
         }
@@ -744,12 +1722,12 @@ public class AirportDatabaseApp {
     private void showPylotLicenses() {
         currentTable = "TypeOfPylotLicense";
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT id, name FROM TypeOfPylotLicense ORDER BY id")) {
+             ResultSet rs = stmt.executeQuery("SELECT name FROM TypeOfPylotLicense ORDER BY id")) {
 
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -758,17 +1736,29 @@ public class AirportDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Тип лицензии");
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("id"),
                         rs.getString("name")
                 });
             }
 
             table.setModel(model);
+
+            // Настраиваем сортировку
+            TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+            table.setRowSorter(sorter);
+
+            // Настраиваем ширину столбцов
+            table.getColumnModel().getColumn(0).setPreferredWidth(200);
+            table.getColumnModel().getColumn(0).setMinWidth(200);
+            table.getColumnModel().getColumn(0).setMaxWidth(200);
+            table.getColumnModel().getColumn(1).setPreferredWidth(200);
+            table.getColumnModel().getColumn(1).setMinWidth(200);
+            table.getColumnModel().getColumn(1).setMaxWidth(200);
+
+
             configureTable();
         } catch (SQLException e) {
             showError("Ошибка загрузки типов лицензий: " + e.getMessage());
@@ -777,12 +1767,12 @@ public class AirportDatabaseApp {
     private void showClearanceLevels() {
         currentTable = "ClearanceLevelsList";
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT id, nameOfLevel FROM ClearanceLevelsList ORDER BY id")) {
+             ResultSet rs = stmt.executeQuery("SELECT nameOfLevel FROM ClearanceLevelsList ORDER BY id")) {
 
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -791,12 +1781,10 @@ public class AirportDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Уровень допуска");
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("id"),
                         rs.getString("nameOfLevel")
                 });
             }
@@ -811,38 +1799,49 @@ public class AirportDatabaseApp {
         currentTable = "Childrens";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(
-                     "SELECT c.ChildID, c.ChildName, c.ChildBirthDay " +
+                     "SELECT c.ChildName, c.ChildBirthDay " +
                              "FROM Childrens c ORDER BY c.ChildName")) {
 
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
 
                 @Override
                 public Class<?> getColumnClass(int columnIndex) {
                     switch (columnIndex) {
                         case 0: return Integer.class;
-                        case 2: return Date.class;
+                        case 1: return Date.class;
                         default: return String.class;
                     }
                 }
             };
 
-            model.addColumn("ID ребенка");
             model.addColumn("Имя ребенка");
             model.addColumn("Дата рождения");
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("ChildID"),
                         rs.getString("ChildName"),
                         rs.getDate("ChildBirthDay")
                 });
             }
 
             table.setModel(model);
+
+            // Настраиваем сортировку
+            TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+            table.setRowSorter(sorter);
+
+            // Настраиваем ширину столбцов
+            table.getColumnModel().getColumn(0).setPreferredWidth(300);
+            table.getColumnModel().getColumn(0).setMinWidth(300);
+            table.getColumnModel().getColumn(0).setMaxWidth(300);
+            table.getColumnModel().getColumn(1).setPreferredWidth(200);
+            table.getColumnModel().getColumn(1).setMinWidth(200);
+            table.getColumnModel().getColumn(1).setMaxWidth(200);
+
             configureTableWithDates();
         } catch (SQLException e) {
             showError("Ошибка загрузки данных о детях: " + e.getMessage());
@@ -861,7 +1860,7 @@ public class AirportDatabaseApp {
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -881,6 +1880,19 @@ public class AirportDatabaseApp {
             }
 
             table.setModel(model);
+
+            // Настраиваем сортировку
+            TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+            table.setRowSorter(sorter);
+
+            // Настраиваем ширину столбцов
+            table.getColumnModel().getColumn(0).setPreferredWidth(300);
+            table.getColumnModel().getColumn(0).setMinWidth(300);
+            table.getColumnModel().getColumn(0).setMaxWidth(300);
+            table.getColumnModel().getColumn(1).setPreferredWidth(300);
+            table.getColumnModel().getColumn(1).setMinWidth(300);
+            table.getColumnModel().getColumn(1).setMaxWidth(300);
+
             configureTable();
         } catch (SQLException e) {
             showError("Ошибка загрузки связей сотрудник-ребенок: " + e.getMessage());
@@ -936,7 +1948,7 @@ public class AirportDatabaseApp {
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -975,8 +1987,14 @@ public class AirportDatabaseApp {
 
             // Настраиваем ширину столбцов
             table.getColumnModel().getColumn(0).setPreferredWidth(250); // ФИО
+            table.getColumnModel().getColumn(0).setMinWidth(300);
+            table.getColumnModel().getColumn(0).setMaxWidth(300);
             table.getColumnModel().getColumn(1).setPreferredWidth(120); // Дата
+            table.getColumnModel().getColumn(1).setMinWidth(120);
+            table.getColumnModel().getColumn(1).setMaxWidth(120);
             table.getColumnModel().getColumn(2).setPreferredWidth(100); // Статус
+            table.getColumnModel().getColumn(2).setMinWidth(100);
+            table.getColumnModel().getColumn(2).setMaxWidth(100);
 
             // Форматирование дат
             table.setDefaultRenderer(Date.class, new DefaultTableCellRenderer() {
@@ -1016,7 +2034,7 @@ public class AirportDatabaseApp {
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -1048,8 +2066,12 @@ public class AirportDatabaseApp {
             sorter.setComparator(1, String.CASE_INSENSITIVE_ORDER); // Уровень допуска
 
             // Настраиваем ширину столбцов
-            table.getColumnModel().getColumn(0).setPreferredWidth(250); // ФИО
-            table.getColumnModel().getColumn(1).setPreferredWidth(150); // Уровень допуска
+            table.getColumnModel().getColumn(0).setPreferredWidth(300); // ФИО
+            table.getColumnModel().getColumn(0).setMinWidth(300);
+            table.getColumnModel().getColumn(0).setMaxWidth(300);
+            table.getColumnModel().getColumn(1).setPreferredWidth(200); // Уровень допуска
+            table.getColumnModel().getColumn(1).setMinWidth(200);
+            table.getColumnModel().getColumn(1).setMaxWidth(200);
 
             // Общие настройки таблицы
             table.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -1074,7 +2096,7 @@ public class AirportDatabaseApp {
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -1105,8 +2127,14 @@ public class AirportDatabaseApp {
             sorter.setComparator(2, String.CASE_INSENSITIVE_ORDER);
 
             table.getColumnModel().getColumn(0).setPreferredWidth(250);
+            table.getColumnModel().getColumn(0).setMinWidth(250);
+            table.getColumnModel().getColumn(0).setMaxWidth(250);
             table.getColumnModel().getColumn(1).setPreferredWidth(150);
+            table.getColumnModel().getColumn(1).setMinWidth(150);
+            table.getColumnModel().getColumn(1).setMaxWidth(150);
             table.getColumnModel().getColumn(2).setPreferredWidth(200);
+            table.getColumnModel().getColumn(2).setMinWidth(200);
+            table.getColumnModel().getColumn(2).setMaxWidth(200);
 
             table.setFont(new Font("Arial", Font.PLAIN, 14));
             table.setRowHeight(25);
@@ -1131,7 +2159,7 @@ public class AirportDatabaseApp {
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -1163,10 +2191,18 @@ public class AirportDatabaseApp {
                 sorter.setComparator(i, String.CASE_INSENSITIVE_ORDER);
             }
 
-            table.getColumnModel().getColumn(0).setPreferredWidth(250);
+            table.getColumnModel().getColumn(0).setPreferredWidth(300);
+            table.getColumnModel().getColumn(0).setMinWidth(300);
+            table.getColumnModel().getColumn(0).setMaxWidth(300);
             table.getColumnModel().getColumn(1).setPreferredWidth(120);
+            table.getColumnModel().getColumn(1).setMinWidth(120);
+            table.getColumnModel().getColumn(1).setMaxWidth(120);
             table.getColumnModel().getColumn(2).setPreferredWidth(120);
+            table.getColumnModel().getColumn(2).setMinWidth(120);
+            table.getColumnModel().getColumn(2).setMaxWidth(120);
             table.getColumnModel().getColumn(3).setPreferredWidth(120);
+            table.getColumnModel().getColumn(3).setMinWidth(120);
+            table.getColumnModel().getColumn(3).setMaxWidth(120);
 
             table.setFont(new Font("Arial", Font.PLAIN, 14));
             table.setRowHeight(25);
@@ -1193,7 +2229,7 @@ public class AirportDatabaseApp {
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -1228,10 +2264,20 @@ public class AirportDatabaseApp {
             }
 
             table.getColumnModel().getColumn(0).setPreferredWidth(250);
+            table.getColumnModel().getColumn(0).setMinWidth(250);
+            table.getColumnModel().getColumn(0).setMaxWidth(250);
             table.getColumnModel().getColumn(1).setPreferredWidth(150);
+            table.getColumnModel().getColumn(1).setMinWidth(150);
+            table.getColumnModel().getColumn(1).setMaxWidth(150);
             table.getColumnModel().getColumn(2).setPreferredWidth(100);
+            table.getColumnModel().getColumn(2).setMinWidth(100);
+            table.getColumnModel().getColumn(2).setMaxWidth(100);
             table.getColumnModel().getColumn(3).setPreferredWidth(100);
+            table.getColumnModel().getColumn(3).setMinWidth(100);
+            table.getColumnModel().getColumn(3).setMaxWidth(100);
             table.getColumnModel().getColumn(4).setPreferredWidth(120);
+            table.getColumnModel().getColumn(4).setMinWidth(120);
+            table.getColumnModel().getColumn(4).setMaxWidth(120);
 
             table.setFont(new Font("Arial", Font.PLAIN, 14));
             table.setRowHeight(25);
@@ -1255,7 +2301,7 @@ public class AirportDatabaseApp {
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -1286,8 +2332,14 @@ public class AirportDatabaseApp {
             }
 
             table.getColumnModel().getColumn(0).setPreferredWidth(250);
+            table.getColumnModel().getColumn(0).setMinWidth(250);
+            table.getColumnModel().getColumn(0).setMaxWidth(250);
             table.getColumnModel().getColumn(1).setPreferredWidth(150);
+            table.getColumnModel().getColumn(1).setMinWidth(150);
+            table.getColumnModel().getColumn(1).setMaxWidth(150);
             table.getColumnModel().getColumn(2).setPreferredWidth(150);
+            table.getColumnModel().getColumn(2).setMinWidth(150);
+            table.getColumnModel().getColumn(2).setMaxWidth(150);
 
             table.setFont(new Font("Arial", Font.PLAIN, 14));
             table.setRowHeight(25);
@@ -1309,7 +2361,7 @@ public class AirportDatabaseApp {
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
             };
 
@@ -1334,6 +2386,8 @@ public class AirportDatabaseApp {
 
             // Настраиваем ширину столбцов
             table.getColumnModel().getColumn(0).setPreferredWidth(300);
+            table.getColumnModel().getColumn(0).setMinWidth(300);
+            table.getColumnModel().getColumn(0).setMaxWidth(300);
 
             // Общие настройки таблицы
             table.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -1354,7 +2408,7 @@ public class AirportDatabaseApp {
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
             };
 
@@ -1382,7 +2436,11 @@ public class AirportDatabaseApp {
 
             // Настраиваем ширину столбцов
             table.getColumnModel().getColumn(0).setPreferredWidth(300);
+            table.getColumnModel().getColumn(0).setMinWidth(300);
+            table.getColumnModel().getColumn(0).setMaxWidth(300);
             table.getColumnModel().getColumn(1).setPreferredWidth(300);
+            table.getColumnModel().getColumn(1).setMinWidth(300);
+            table.getColumnModel().getColumn(1).setMaxWidth(300);
 
             // Общие настройки таблицы
             table.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -1403,7 +2461,7 @@ public class AirportDatabaseApp {
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
             };
 
@@ -1428,6 +2486,8 @@ public class AirportDatabaseApp {
 
             // Настраиваем ширину столбцов
             table.getColumnModel().getColumn(0).setPreferredWidth(300);
+            table.getColumnModel().getColumn(0).setMinWidth(300);
+            table.getColumnModel().getColumn(0).setMaxWidth(300);
 
             // Общие настройки таблицы
             table.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -1461,7 +2521,7 @@ public class AirportDatabaseApp {
             DefaultTableModel model = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -1515,13 +2575,29 @@ public class AirportDatabaseApp {
 
             // Настраиваем ширину столбцов
             table.getColumnModel().getColumn(0).setPreferredWidth(300); // ФИО
+            table.getColumnModel().getColumn(0).setMinWidth(300);
+            table.getColumnModel().getColumn(0).setMaxWidth(300);
             table.getColumnModel().getColumn(1).setPreferredWidth(200); // Департамент
+            table.getColumnModel().getColumn(1).setMinWidth(200);
+            table.getColumnModel().getColumn(1).setMaxWidth(200);
             table.getColumnModel().getColumn(2).setPreferredWidth(200); // Тип сотрудника
+            table.getColumnModel().getColumn(2).setMinWidth(200);
+            table.getColumnModel().getColumn(2).setMaxWidth(200);
             table.getColumnModel().getColumn(3).setPreferredWidth(200); // Команда
+            table.getColumnModel().getColumn(3).setMinWidth(200);
+            table.getColumnModel().getColumn(3).setMaxWidth(200);
             table.getColumnModel().getColumn(4).setPreferredWidth(100);  // Зарплата
+            table.getColumnModel().getColumn(4).setMinWidth(100);
+            table.getColumnModel().getColumn(4).setMaxWidth(100);
             table.getColumnModel().getColumn(5).setPreferredWidth(150); // Дата приема
+            table.getColumnModel().getColumn(5).setMinWidth(150);
+            table.getColumnModel().getColumn(5).setMaxWidth(150);
             table.getColumnModel().getColumn(6).setPreferredWidth(150); // Дата рождения
+            table.getColumnModel().getColumn(6).setMinWidth(150);
+            table.getColumnModel().getColumn(6).setMaxWidth(150);
             table.getColumnModel().getColumn(7).setPreferredWidth(50);  // Пол
+            table.getColumnModel().getColumn(7).setMinWidth(50);
+            table.getColumnModel().getColumn(7).setMaxWidth(50);
 
             // Форматирование дат
             table.setDefaultRenderer(Date.class, new DefaultTableCellRenderer() {
