@@ -20,11 +20,13 @@ public class AirportDatabaseApp {
     private Connection connection;
     private String currentTable = "AirportStaff";
 
-    public AirportDatabaseApp() {
+    public AirportDatabaseApp(Connection connection) {
+        this.connection = connection;
         frame = new JFrame("Информация об аэропорте");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(1200, 600);
+        frame.setSize(1300, 600);
         frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
 
         tableModel = new DefaultTableModel();
         table = new JTable(tableModel);
@@ -373,222 +375,12 @@ public class AirportDatabaseApp {
         try {
             connection = DatabaseManager.getConnection();
 
-            createTables();
-            initializeData();
 
             showTable("AirportStaff");
 
         } catch (Exception e) {
             showError("Ошибка инициализации базы данных: " + e.getMessage());
             System.exit(1);
-        }
-    }
-
-
-
-    private void createTables() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            // 1. Создаем основные таблицы (сначала независимые)
-            stmt.execute("CREATE TABLE IF NOT EXISTS TypeOfAirportStaff (" +
-                    "IdOfType INT PRIMARY KEY, TypeName VARCHAR(50) NOT NULL)");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS Departments (" +
-                    "DepartmentID INT PRIMARY KEY, DepartmentName VARCHAR(100) NOT NULL, Location VARCHAR(100))");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS Teams (" +
-                    "TeamID INT PRIMARY KEY, TeamName VARCHAR(100) NOT NULL)");
-
-            // 2. Создаем справочные таблицы для специализаций
-            stmt.execute("CREATE TABLE IF NOT EXISTS TypeOfQualificationLevel (" +
-                    "id INT PRIMARY KEY, name VARCHAR(400) NOT NULL)");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS TypeOfPylotLicense (" +
-                    "id INT PRIMARY KEY, name VARCHAR(400) NOT NULL UNIQUE)");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS ClearanceLevelsList (" +
-                    "id INT PRIMARY KEY, nameOfLevel VARCHAR(200) NOT NULL UNIQUE)");
-
-            // 3. Основная таблица сотрудников (теперь без CASCADE для Teams)
-            stmt.execute("CREATE TABLE IF NOT EXISTS AirportStaff (" +
-                    "WorkerID INT PRIMARY KEY, " +
-                    "FIO VARCHAR(100) NOT NULL, " +
-                    "DepartID INT REFERENCES Departments(DepartmentID) ON DELETE SET NULL, " +
-                    "WorkerType INT REFERENCES TypeOfAirportStaff(IdOfType) ON DELETE SET NULL, " +
-                    "TeamID INT REFERENCES Teams(TeamID) ON DELETE SET NULL, " +
-                    "Employment DATE, " +
-                    "Gender CHAR(1), " +
-                    "BirthDay DATE, " +
-                    "Salary INT)");
-
-            // 4. Таблицы специализаций сотрудников (CASCADE только в одну сторону)
-            stmt.execute("CREATE TABLE IF NOT EXISTS Pylots (" +
-                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
-                    "MedCheckUp CHAR(1) DEFAULT 'N', " +
-                    "PylotLicense INT REFERENCES TypeOfPylotLicense(id) ON DELETE SET NULL, " +
-                    "FlightHours INT, " +
-                    "Qualification_Level INT REFERENCES TypeOfQualificationLevel(id) ON DELETE SET NULL)");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS PylotsAndMedCheckUps (" +
-                    "PylotID INT REFERENCES Pylots(WorkerID) ON DELETE CASCADE, " +
-                    "CheckUpDate TIMESTAMP, " +
-                    "Passed CHAR(1) DEFAULT 'N', " +
-                    "PRIMARY KEY (PylotID, CheckUpDate))");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS Dispatchers (" +
-                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
-                    "ClearanceLevel INT REFERENCES ClearanceLevelsList(id) ON DELETE SET NULL)");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS Technics (" +
-                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
-                    "ClearanceLevel INT REFERENCES ClearanceLevelsList(id) ON DELETE SET NULL, " +
-                    "Specialization VARCHAR(400))");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS Cashiers (" +
-                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
-                    "CustomerServiceExperience CHAR(1) DEFAULT 'N', " +
-                    "PaymentProcessingSkills CHAR(1) DEFAULT 'N', " +
-                    "BookingSystemKnowledge CHAR(1) DEFAULT 'N')");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS SecurityStaff (" +
-                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
-                    "ClearanceLevel INT REFERENCES ClearanceLevelsList(id) ON DELETE SET NULL, " +
-                    "EmergencyResponseSkills CHAR(1) DEFAULT 'N', " +
-                    "CCTVExperience CHAR(1) DEFAULT 'N', " +
-                    "InspectionSkills CHAR(1) DEFAULT 'N')");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS HelperDepartment (" +
-                    "WorkerID INT PRIMARY KEY REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
-                    "SchedulingSkills CHAR(1) DEFAULT 'N', " +
-                    "HRProcessesKnowledge CHAR(1) DEFAULT 'N')");
-
-            // 5. Таблицы для детей сотрудников
-            stmt.execute("CREATE TABLE IF NOT EXISTS Childrens (" +
-                    "ChildID INT PRIMARY KEY, ChildName VARCHAR(100) NOT NULL, ChildBirthDay DATE)");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS WorkersAndChildrens (" +
-                    "WorkerID INT REFERENCES AirportStaff(WorkerID) ON DELETE CASCADE, " +
-                    "ChildID INT REFERENCES Childrens(ChildID) ON DELETE CASCADE, " +
-                    "PRIMARY KEY (WorkerID, ChildID))");
-        }
-    }
-
-
-
-
-
-    private void initializeData() throws SQLException {
-        if (isTableEmpty("AirportStaff")) {
-            insertTestData();
-        }
-    }
-
-    private boolean isTableEmpty(String tableName) throws SQLException {
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM " + tableName)) {
-            return rs.next() && rs.getInt(1) == 0;
-        }
-    }
-
-    private void insertTestData() throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            // 1. Заполняем справочники типов сотрудников
-            stmt.execute("INSERT INTO TypeOfAirportStaff VALUES " +
-                    "(1,'Пилот'),(2,'Диспетчер'),(3,'Техник'),(4,'Кассир')," +
-                    "(5,'Сотрудник безопасности'),(6,'Сотрудник справочной')");
-
-            // 2. Заполняем справочники квалификаций и лицензий
-            stmt.execute("INSERT INTO TypeOfQualificationLevel VALUES " +
-                    "(1,'Junior'),(2,'Middle'),(3,'Senior'),(4,'Lead'),(5,'Expert')");
-
-            stmt.execute("INSERT INTO TypeOfPylotLicense VALUES " +
-                    "(1,'Частный пилот (PPL)'),(2,'Коммерческий пилот (CPL)')," +
-                    "(3,'Линейный пилот (ATPL)'),(4,'Пилот-инструктор')");
-
-            stmt.execute("INSERT INTO ClearanceLevelsList VALUES " +
-                    "(1,'Базовый'),(2,'Средний'),(3,'Высокий'),(4,'Максимальный')");
-
-            // 3. Заполняем отделы
-            stmt.execute("INSERT INTO Departments VALUES " +
-                    "(1,'Летный отдел','Терминал A, 2 этаж')," +
-                    "(2,'Диспетчерская служба','Башня управления')," +
-                    "(3,'Техническая служба','Ангар 1')," +
-                    "(4,'Кассы и регистрация','Терминал B, 1 этаж')," +
-                    "(5,'Служба безопасности','Терминал C, КПП')," +
-                    "(6,'Справочная служба','Терминал A, 1 этаж')");
-
-            // 4. Заполняем команды
-            stmt.execute("INSERT INTO Teams VALUES " +
-                    "(1,'Экипаж 101'),(2,'Экипаж 202'),(3,'Диспетчеры смены A')," +
-                    "(4,'Техническая бригада 1'),(5,'Кассиры утренней смены')," +
-                    "(6,'Охрана терминала B'),(7,'Справочная смена 1')");
-
-            // 5. Заполняем основных сотрудников
-            stmt.execute("INSERT INTO AirportStaff VALUES " +
-                    // Пилоты
-                    "(1,'Иванов Иван Иванович',1,1,1,'2015-06-15','M','1980-05-10',250000)," +
-                    "(2,'Петров Петр Петрович',1,1,1,'2016-03-10','M','1982-11-22',230000)," +
-                    "(3,'Сидорова Мария Сергеевна',1,1,2,'2017-08-22','F','1985-07-15',220000)," +
-                    // Диспетчеры
-                    "(4,'Кузнецов Алексей Дмитриевич',2,2,3,'2018-05-14','M','1990-02-28',150000)," +
-                    "(5,'Николаева Елена Викторовна',2,2,3,'2019-01-30','F','1992-09-17',140000)," +
-                    // Техники
-                    "(6,'Васильев Дмитрий Олегович',3,3,4,'2016-11-05','M','1988-04-25',120000)," +
-                    "(7,'Григорьева Анна Павловна',3,3,4,'2017-09-18','F','1991-12-10',110000)," +
-                    // Кассиры
-                    "(8,'Смирнова Ольга Игоревна',4,4,5,'2018-07-22','F','1993-03-15',90000)," +
-                    "(9,'Федоров Михаил Андреевич',4,4,5,'2019-04-10','M','1994-08-20',95000)," +
-                    // Охрана
-                    "(10,'Алексеев Сергей Владимирович',5,5,6,'2017-02-15','M','1989-06-12',100000)," +
-                    "(11,'Дмитриева Татьяна Николаевна',5,5,6,'2018-11-28','F','1990-10-05',105000)," +
-                    // Справочная
-                    "(12,'Павлова Виктория Сергеевна',6,6,7,'2019-08-15','F','1995-01-30',85000)," +
-                    "(13,'Козлов Артем Игоревич',6,6,7,'2020-03-10','M','1996-07-22',88000)");
-
-            // 6. Заполняем специализированные таблицы
-            // Пилоты
-            stmt.execute("INSERT INTO Pylots VALUES " +
-                    "(1,'Y',3,4500,4)," +
-                    "(2,'Y',2,3200,3)," +
-                    "(3,'Y',1,1800,2)");
-
-            // Медосмотры пилотов
-            stmt.execute("INSERT INTO PylotsAndMedCheckUps VALUES " +
-                    "(1,'2023-01-15','Y'),(1,'2023-07-15','Y')," +
-                    "(2,'2023-02-20','Y'),(2,'2023-08-20','N')," +
-                    "(3,'2023-03-10','Y'),(3,'2023-09-10','Y')");
-
-            // Диспетчеры
-            stmt.execute("INSERT INTO Dispatchers VALUES " +
-                    "(4,3),(5,2)");
-
-            // Техники
-            stmt.execute("INSERT INTO Technics VALUES " +
-                    "(6,3,'Двигатели'),(7,2,'Электроника')");
-
-            // Кассиры
-            stmt.execute("INSERT INTO Cashiers VALUES " +
-                    "(8,'Y','Y','Y'),(9,'Y','N','Y')");
-
-            // Охрана
-            stmt.execute("INSERT INTO SecurityStaff VALUES " +
-                    "(10,4,'Y','Y','Y'),(11,3,'Y','N','Y')");
-
-            // Справочная
-            stmt.execute("INSERT INTO HelperDepartment VALUES " +
-                    "(12,'Y','N'),(13,'N','Y')");
-
-            // 7. Заполняем данные о детях
-            stmt.execute("INSERT INTO Childrens VALUES " +
-                    "(1,'Иванов Алексей Иванович','2010-05-15')," +
-                    "(2,'Иванова София Ивановна','2015-08-22')," +
-                    "(3,'Петрова Дарья Петровна','2018-03-10')," +
-                    "(4,'Сидоров Максим Александрович','2016-11-28')," +
-                    "(5,'Кузнецова Алиса Алексеевна','2019-07-03')," +
-                    "(6,'Павлов Денис Викторович','2017-05-18')");
-
-            // 8. Связи сотрудник-ребенок
-            stmt.execute("INSERT INTO WorkersAndChildrens VALUES " +
-                    "(1,1),(1,2),(3,4),(4,5),(8,3),(12,6)");
         }
     }
 
@@ -2658,14 +2450,6 @@ public class AirportDatabaseApp {
 
     private void showError(String message) {
         JOptionPane.showMessageDialog(frame, message, "Ошибка", JOptionPane.ERROR_MESSAGE);
-    }
-
-    public void show() {
-        frame.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new AirportDatabaseApp().show());
     }
 
     // Вспомогательный класс для диалогов ввода
