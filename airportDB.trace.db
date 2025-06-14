@@ -1,4 +1,4 @@
-2025-06-04 07:04:14.762129+07:00 jdbc[3]: exception
+2025-06-04 13:23:53.527451+07:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Столбец "DEPARTMENTLEADER" не найден
 Column "DEPARTMENTLEADER" not found; SQL statement:
 SELECT DepartmentLeader FROM Departments LIMIT 0 [42122-224]
@@ -20,176 +20,62 @@ SELECT DepartmentLeader FROM Departments LIMIT 0 [42122-224]
 	at org.example.MainWindow.FrameWork.createTables(FrameWork.java:272)
 	at org.example.MainWindow.FrameWork.<init>(FrameWork.java:68)
 	at org.example.Main.main(Main.java:11)
-2025-06-04 07:42:49.712816+07:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Таблица "POSITIONS" не найдена
-Table "POSITIONS" not found; SQL statement:
-SELECT s.FIO, DATEDIFF('YEAR', s.HireDate, CURRENT_DATE) AS ExperienceYears, DATEDIFF('YEAR', s.BirthDay, CURRENT_DATE) AS Age, s.Gender, s.ChildrenCount, s.Salary, p.PositionName, d.DepartmentName FROM AirportStaff s JOIN Positions p ON s.PositionID = p.PositionID JOIN Departments d ON s.DepartmentID = d.DepartmentID WHERE (s.Gender = 'M' OR s.Gender = 'F') AND DATEDIFF('YEAR', s.BirthDay, CURRENT_DATE) BETWEEN 20 AND 65 AND s.ChildrenCount BETWEEN 0 AND 5 AND s.Salary BETWEEN 30000 AND 200000 AND DATEDIFF('YEAR', s.HireDate, CURRENT_DATE) BETWEEN 1 AND 30 ORDER BY ExperienceYears DESC, Salary DESC [42102-224]
-2025-06-04 07:43:02.039371+07:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Таблица "MEDICALCHECKUPS" не найдена
-Table "MEDICALCHECKUPS" not found; SQL statement:
-SELECT s.FIO, DATEDIFF('YEAR', s.BirthDay, CURRENT_DATE) AS Age, s.Gender, s.Salary, m.MedicalCheckUpDate, CASE WHEN m.Passed = 'Y' THEN 'Passed' ELSE 'Not Passed' END AS MedicalStatus FROM AirportStaff s JOIN MedicalCheckUps m ON s.StaffID = m.StaffID JOIN Positions p ON s.PositionID = p.PositionID WHERE p.PositionName = 'Pilot' AND YEAR(m.MedicalCheckUpDate) = 2023 AND (m.Passed = 'Y' OR m.Passed = 'N') AND (s.Gender = 'M' OR s.Gender = 'F') AND DATEDIFF('YEAR', s.BirthDay, CURRENT_DATE) BETWEEN 25 AND 65 AND s.Salary BETWEEN 80000 AND 200000 ORDER BY MedicalStatus, Age DESC [42102-224]
-2025-06-04 07:47:57.735973+07:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Столбец "S.HIREDATE" не найден
-Column "S.HIREDATE" not found; SQL statement:
-SELECT s.FIO, DATEDIFF('YEAR', s.HireDate, CURRENT_DATE) AS ExperienceYears, DATEDIFF('YEAR', s.BirthDay, CURRENT_DATE) AS Age, s.Gender, s.ChildrenCount, s.Salary, t.TeamName AS Team FROM AirportStaff s LEFT JOIN Teams t ON s.TeamID = t.TeamID WHERE (s.Gender = 'M' OR s.Gender = 'F') AND DATEDIFF('YEAR', s.BirthDay, CURRENT_DATE) BETWEEN 20 AND 65 AND s.ChildrenCount BETWEEN 0 AND 5 AND s.Salary BETWEEN 30000 AND 200000 AND DATEDIFF('YEAR', s.HireDate, CURRENT_DATE) BETWEEN 1 AND 30 ORDER BY ExperienceYears DESC, Salary DESC [42122-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	at org.h2.message.DbException.get(DbException.java:223)
-	at org.h2.message.DbException.get(DbException.java:199)
-	at org.h2.expression.ExpressionColumn.getColumnException(ExpressionColumn.java:244)
-	at org.h2.expression.ExpressionColumn.optimizeOther(ExpressionColumn.java:226)
-	at org.h2.expression.ExpressionColumn.optimize(ExpressionColumn.java:213)
-	at org.h2.expression.function.DateTimeFunction.optimize(DateTimeFunction.java:996)
-	at org.h2.expression.Alias.optimize(Alias.java:52)
-	at org.h2.command.query.Select.prepareExpressions(Select.java:1170)
-	at org.h2.command.query.Query.prepare(Query.java:218)
-	at org.h2.command.Parser.prepareCommand(Parser.java:489)
-	at org.h2.engine.SessionLocal.prepareLocal(SessionLocal.java:639)
-	at org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:559)
-	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1166)
-	at org.h2.jdbc.JdbcStatement.executeQuery(JdbcStatement.java:94)
-	at org.example.RequestFrame.executeQuery(RequestFrame.java:366)
-	at org.example.RequestFrame.lambda$createQueryButton$1(RequestFrame.java:350)
-	at java.desktop/javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1972)
-	at java.desktop/javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2314)
-	at java.desktop/javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:407)
-	at java.desktop/javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:262)
-	at java.desktop/javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:279)
-	at java.desktop/java.awt.Component.processMouseEvent(Component.java:6621)
-	at java.desktop/javax.swing.JComponent.processMouseEvent(JComponent.java:3398)
-	at java.desktop/java.awt.Component.processEvent(Component.java:6386)
-	at java.desktop/java.awt.Container.processEvent(Container.java:2266)
-	at java.desktop/java.awt.Component.dispatchEventImpl(Component.java:4996)
-	at java.desktop/java.awt.Container.dispatchEventImpl(Container.java:2324)
-	at java.desktop/java.awt.Component.dispatchEvent(Component.java:4828)
-	at java.desktop/java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4948)
-	at java.desktop/java.awt.LightweightDispatcher.processMouseEvent(Container.java:4575)
-	at java.desktop/java.awt.LightweightDispatcher.dispatchEvent(Container.java:4516)
-	at java.desktop/java.awt.Container.dispatchEventImpl(Container.java:2310)
-	at java.desktop/java.awt.Window.dispatchEventImpl(Window.java:2780)
-	at java.desktop/java.awt.Component.dispatchEvent(Component.java:4828)
-	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:775)
-	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:720)
-	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:714)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
-	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:87)
-	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:98)
-	at java.desktop/java.awt.EventQueue$5.run(EventQueue.java:747)
-	at java.desktop/java.awt.EventQueue$5.run(EventQueue.java:745)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
-	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:87)
-	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:744)
-	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
-	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
-	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
-	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
-	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
-	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
-2025-06-04 07:48:04.231897+07:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Столбец "S.MEDICALCHECKUPPASSED" не найден
-Column "S.MEDICALCHECKUPPASSED" not found; SQL statement:
-SELECT s.FIO, DATEDIFF('YEAR', s.BirthDay, CURRENT_DATE) AS Age, s.Gender, s.Salary, CASE WHEN s.MedicalCheckUpPassed = 'Y' THEN 'Passed' ELSE 'Not Passed' END AS MedicalStatus FROM AirportStaff s WHERE s.Position = 'Pilot' AND (s.MedicalCheckUpPassed = 'Y' OR s.MedicalCheckUpPassed = 'N') AND (s.Gender = 'M' OR s.Gender = 'F') AND DATEDIFF('YEAR', s.BirthDay, CURRENT_DATE) BETWEEN 25 AND 65 AND s.Salary BETWEEN 80000 AND 200000 ORDER BY MedicalStatus, Age DESC [42122-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	at org.h2.message.DbException.get(DbException.java:223)
-	at org.h2.message.DbException.get(DbException.java:199)
-	at org.h2.expression.ExpressionColumn.getColumnException(ExpressionColumn.java:244)
-	at org.h2.expression.ExpressionColumn.optimizeOther(ExpressionColumn.java:226)
-	at org.h2.expression.ExpressionColumn.optimize(ExpressionColumn.java:213)
-	at org.h2.expression.condition.Comparison.optimize(Comparison.java:147)
-	at org.h2.expression.SearchedCase.optimize(SearchedCase.java:46)
-	at org.h2.expression.Alias.optimize(Alias.java:52)
-	at org.h2.command.query.Select.prepareExpressions(Select.java:1170)
-	at org.h2.command.query.Query.prepare(Query.java:218)
-	at org.h2.command.Parser.prepareCommand(Parser.java:489)
-	at org.h2.engine.SessionLocal.prepareLocal(SessionLocal.java:639)
-	at org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:559)
-	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1166)
-	at org.h2.jdbc.JdbcStatement.executeQuery(JdbcStatement.java:94)
-	at org.example.RequestFrame.executeQuery(RequestFrame.java:366)
-	at org.example.RequestFrame.lambda$createQueryButton$1(RequestFrame.java:350)
-	at java.desktop/javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1972)
-	at java.desktop/javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2314)
-	at java.desktop/javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:407)
-	at java.desktop/javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:262)
-	at java.desktop/javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:279)
-	at java.desktop/java.awt.Component.processMouseEvent(Component.java:6621)
-	at java.desktop/javax.swing.JComponent.processMouseEvent(JComponent.java:3398)
-	at java.desktop/java.awt.Component.processEvent(Component.java:6386)
-	at java.desktop/java.awt.Container.processEvent(Container.java:2266)
-	at java.desktop/java.awt.Component.dispatchEventImpl(Component.java:4996)
-	at java.desktop/java.awt.Container.dispatchEventImpl(Container.java:2324)
-	at java.desktop/java.awt.Component.dispatchEvent(Component.java:4828)
-	at java.desktop/java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4948)
-	at java.desktop/java.awt.LightweightDispatcher.processMouseEvent(Container.java:4575)
-	at java.desktop/java.awt.LightweightDispatcher.dispatchEvent(Container.java:4516)
-	at java.desktop/java.awt.Container.dispatchEventImpl(Container.java:2310)
-	at java.desktop/java.awt.Window.dispatchEventImpl(Window.java:2780)
-	at java.desktop/java.awt.Component.dispatchEvent(Component.java:4828)
-	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:775)
-	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:720)
-	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:714)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
-	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:87)
-	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:98)
-	at java.desktop/java.awt.EventQueue$5.run(EventQueue.java:747)
-	at java.desktop/java.awt.EventQueue$5.run(EventQueue.java:745)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
-	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:87)
-	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:744)
-	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
-	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
-	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
-	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
-	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
-	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
-2025-06-04 07:52:02.254571+07:00 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLDataException: Параметр "#1" не установлен
-Parameter "#1" is not set; SQL statement:
-SELECT p.WorkerID, s.FIO, CASE s.Gender WHEN 'M' THEN 'Мужской' WHEN 'F' THEN 'Женский' ELSE '-' END AS Gender, TIMESTAMPDIFF(YEAR, s.BirthDay, CURDATE()) AS Age, s.Salary, CASE WHEN EXISTS (SELECT 1 FROM PylotsAndMedCheckUps pm WHERE pm.PylotID = p.WorkerID AND YEAR(pm.CheckUpDate) = ? AND pm.Passed = 'Y') THEN 'Прошел' ELSE 'Не прошел' END AS MedicalCheck FROM Pylots p JOIN AirportStaff s ON p.WorkerID = s.WorkerID ORDER BY MedicalCheck, Gender, Age [90012-224]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:658)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
-	at org.h2.message.DbException.get(DbException.java:223)
-	at org.h2.message.DbException.get(DbException.java:199)
-	at org.h2.expression.Parameter.checkSet(Parameter.java:75)
-	at org.h2.command.Prepared.checkParameters(Prepared.java:207)
-	at org.h2.command.CommandContainer.query(CommandContainer.java:251)
-	at org.h2.command.Command.executeQuery(Command.java:192)
-	at org.h2.jdbc.JdbcStatement.executeQuery(JdbcStatement.java:101)
-	at org.example.RequestFrame.executeQuery(RequestFrame.java:364)
-	at org.example.RequestFrame.lambda$createQueryButton$1(RequestFrame.java:348)
-	at java.desktop/javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1972)
-	at java.desktop/javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2314)
-	at java.desktop/javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:407)
-	at java.desktop/javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:262)
-	at java.desktop/javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:279)
-	at java.desktop/java.awt.Component.processMouseEvent(Component.java:6621)
-	at java.desktop/javax.swing.JComponent.processMouseEvent(JComponent.java:3398)
-	at java.desktop/java.awt.Component.processEvent(Component.java:6386)
-	at java.desktop/java.awt.Container.processEvent(Container.java:2266)
-	at java.desktop/java.awt.Component.dispatchEventImpl(Component.java:4996)
-	at java.desktop/java.awt.Container.dispatchEventImpl(Container.java:2324)
-	at java.desktop/java.awt.Component.dispatchEvent(Component.java:4828)
-	at java.desktop/java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4948)
-	at java.desktop/java.awt.LightweightDispatcher.processMouseEvent(Container.java:4575)
-	at java.desktop/java.awt.LightweightDispatcher.dispatchEvent(Container.java:4516)
-	at java.desktop/java.awt.Container.dispatchEventImpl(Container.java:2310)
-	at java.desktop/java.awt.Window.dispatchEventImpl(Window.java:2780)
-	at java.desktop/java.awt.Component.dispatchEvent(Component.java:4828)
-	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:775)
-	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:720)
-	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:714)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
-	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:87)
-	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:98)
-	at java.desktop/java.awt.EventQueue$5.run(EventQueue.java:747)
-	at java.desktop/java.awt.EventQueue$5.run(EventQueue.java:745)
-	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
-	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:87)
-	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:744)
-	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
-	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
-	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
-	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
-	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
-	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+2025-06-04 13:26:19.686534+07:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Синтаксическая ошибка в выражении SQL "SELECT \000a    f.FlightID,\000a    pt.ModelName AS PlaneModel,\000a    loc_from.LocationName AS DepartureLocation,\000a    loc_to.LocationName AS ArrivalLocation,\000a    DATEDIFF(MINUTE, f.FromTime, f.ToTime) AS FlightDurationMinutes,\000a    f.FromTime AS DepartureTime,\000a    f.ToTime AS ArrivalTime,\000a    COUNT(t.TicketID) AS TicketsSold,\000a    AVG(t.TicketCost) AS AverageTicketPrice,\000a    (SELECT AVG(COUNT(t2.TicketID))\000a     FROM Flights f2\000a     JOIN Tickets t2 ON f2.FlightID = t2.FlightID AND t2.TicketStatus = 'Sold'\000a     WHERE f2.PlaneID IN (SELECT PlanesID FROM Planes WHERE PlaneTypeID = pl.PlaneTypeID)\000a       AND (f2.FromLocation = f.FromLocation OR [*][same_route_only] = 0)\000a       AND (f2.ToLocation = f.ToLocation OR [same_route_only] = 0)\000a     GROUP BY f2.FlightID) AS AvgTicketsForSimilarFlights\000aFROM \000a    Flights f\000aJOIN \000a    Planes pl ON f.PlaneID = pl.PlanesID\000aJOIN \000a    PlaneTypeCharacteristics pt ON pl.PlaneTypeID = pt.TypeID\000aJOIN \000a    Locations loc_from ON f.FromLocation = loc_from.LocationID\000aJOIN \000a    Locations loc_to ON f.ToLocation = loc_to.LocationID\000aLEFT JOIN \000a    Tickets t ON f.FlightID = t.FlightID AND t.TicketStatus = 'Sold'\000aWHERE \000a    (pt.ModelName = [plane_model] OR [plane_model] IS NULL)\000a    \000a    AND (loc_from.LocationName = [departure_location] OR [departure_location] IS NULL)\000a    \000a    AND (loc_to.LocationName = [arrival_location] OR [arrival_location] IS NULL)\000a    \000a    AND (DATEDIFF(MINUTE, f.FromTime, f.ToTime) BETWEEN [min_duration] AND [max_duration]\000a        OR ([min_duration] IS NULL AND [max_duration] IS NULL))\000a    \000a    AND (t.TicketCost BETWEEN [min_price] AND [max_price]\000a        OR ([min_price] IS NULL AND [max_price] IS NULL))\000a    \000a    AND (CONVERT(TIME, f.FromTime) BETWEEN [start_time] AND [end_time]\000a        OR ([start_time] IS NULL AND [end_time] IS NULL))\000aGROUP BY \000a    f.FlightID,\000a    pt.ModelName,\000a    loc_from.LocationName,\000a    loc_to.LocationName,\000a    f.FromTime,\000a    f.ToTime,\000a    pl.PlaneTypeID,\000a    f.FromLocation,\000a    f.ToLocation\000aORDER BY \000a    f.FromTime;"; ожидалось "INTERSECTS (, NOT, EXISTS, UNIQUE, INTERSECTS"
+Syntax error in SQL statement "SELECT \000a    f.FlightID,\000a    pt.ModelName AS PlaneModel,\000a    loc_from.LocationName AS DepartureLocation,\000a    loc_to.LocationName AS ArrivalLocation,\000a    DATEDIFF(MINUTE, f.FromTime, f.ToTime) AS FlightDurationMinutes,\000a    f.FromTime AS DepartureTime,\000a    f.ToTime AS ArrivalTime,\000a    COUNT(t.TicketID) AS TicketsSold,\000a    AVG(t.TicketCost) AS AverageTicketPrice,\000a    (SELECT AVG(COUNT(t2.TicketID))\000a     FROM Flights f2\000a     JOIN Tickets t2 ON f2.FlightID = t2.FlightID AND t2.TicketStatus = 'Sold'\000a     WHERE f2.PlaneID IN (SELECT PlanesID FROM Planes WHERE PlaneTypeID = pl.PlaneTypeID)\000a       AND (f2.FromLocation = f.FromLocation OR [*][same_route_only] = 0)\000a       AND (f2.ToLocation = f.ToLocation OR [same_route_only] = 0)\000a     GROUP BY f2.FlightID) AS AvgTicketsForSimilarFlights\000aFROM \000a    Flights f\000aJOIN \000a    Planes pl ON f.PlaneID = pl.PlanesID\000aJOIN \000a    PlaneTypeCharacteristics pt ON pl.PlaneTypeID = pt.TypeID\000aJOIN \000a    Locations loc_from ON f.FromLocation = loc_from.LocationID\000aJOIN \000a    Locations loc_to ON f.ToLocation = loc_to.LocationID\000aLEFT JOIN \000a    Tickets t ON f.FlightID = t.FlightID AND t.TicketStatus = 'Sold'\000aWHERE \000a    (pt.ModelName = [plane_model] OR [plane_model] IS NULL)\000a    \000a    AND (loc_from.LocationName = [departure_location] OR [departure_location] IS NULL)\000a    \000a    AND (loc_to.LocationName = [arrival_location] OR [arrival_location] IS NULL)\000a    \000a    AND (DATEDIFF(MINUTE, f.FromTime, f.ToTime) BETWEEN [min_duration] AND [max_duration]\000a        OR ([min_duration] IS NULL AND [max_duration] IS NULL))\000a    \000a    AND (t.TicketCost BETWEEN [min_price] AND [max_price]\000a        OR ([min_price] IS NULL AND [max_price] IS NULL))\000a    \000a    AND (CONVERT(TIME, f.FromTime) BETWEEN [start_time] AND [end_time]\000a        OR ([start_time] IS NULL AND [end_time] IS NULL))\000aGROUP BY \000a    f.FlightID,\000a    pt.ModelName,\000a    loc_from.LocationName,\000a    loc_to.LocationName,\000a    f.FromTime,\000a    f.ToTime,\000a    pl.PlaneTypeID,\000a    f.FromLocation,\000a    f.ToLocation\000aORDER BY \000a    f.FromTime;"; expected "INTERSECTS (, NOT, EXISTS, UNIQUE, INTERSECTS"; SQL statement:
+SELECT 
+    f.FlightID,
+    pt.ModelName AS PlaneModel,
+    loc_from.LocationName AS DepartureLocation,
+    loc_to.LocationName AS ArrivalLocation,
+    DATEDIFF(MINUTE, f.FromTime, f.ToTime) AS FlightDurationMinutes,
+    f.FromTime AS DepartureTime,
+    f.ToTime AS ArrivalTime,
+    COUNT(t.TicketID) AS TicketsSold,
+    AVG(t.TicketCost) AS AverageTicketPrice,
+    (SELECT AVG(COUNT(t2.TicketID))
+     FROM Flights f2
+     JOIN Tickets t2 ON f2.FlightID = t2.FlightID AND t2.TicketStatus = 'Sold'
+     WHERE f2.PlaneID IN (SELECT PlanesID FROM Planes WHERE PlaneTypeID = pl.PlaneTypeID)
+       AND (f2.FromLocation = f.FromLocation OR [same_route_only] = 0)
+       AND (f2.ToLocation = f.ToLocation OR [same_route_only] = 0)
+     GROUP BY f2.FlightID) AS AvgTicketsForSimilarFlights
+FROM 
+    Flights f
+JOIN 
+    Planes pl ON f.PlaneID = pl.PlanesID
+JOIN 
+    PlaneTypeCharacteristics pt ON pl.PlaneTypeID = pt.TypeID
+JOIN 
+    Locations loc_from ON f.FromLocation = loc_from.LocationID
+JOIN 
+    Locations loc_to ON f.ToLocation = loc_to.LocationID
+LEFT JOIN 
+    Tickets t ON f.FlightID = t.FlightID AND t.TicketStatus = 'Sold'
+WHERE 
+    (pt.ModelName = [plane_model] OR [plane_model] IS NULL)
+    
+    AND (loc_from.LocationName = [departure_location] OR [departure_location] IS NULL)
+    
+    AND (loc_to.LocationName = [arrival_location] OR [arrival_location] IS NULL)
+    
+    AND (DATEDIFF(MINUTE, f.FromTime, f.ToTime) BETWEEN [min_duration] AND [max_duration]
+        OR ([min_duration] IS NULL AND [max_duration] IS NULL))
+    
+    AND (t.TicketCost BETWEEN [min_price] AND [max_price]
+        OR ([min_price] IS NULL AND [max_price] IS NULL))
+    
+    AND (CONVERT(TIME, f.FromTime) BETWEEN [start_time] AND [end_time]
+        OR ([start_time] IS NULL AND [end_time] IS NULL))
+GROUP BY 
+    f.FlightID,
+    pt.ModelName,
+    loc_from.LocationName,
+    loc_to.LocationName,
+    f.FromTime,
+    f.ToTime,
+    pl.PlaneTypeID,
+    f.FromLocation,
+    f.ToLocation
+ORDER BY 
+    f.FromTime; [42001-224]

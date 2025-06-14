@@ -24,7 +24,7 @@ public class AirportDatabaseApp {
         this.connection = connection;
         frame = new JFrame("Информация об аэропорте");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(1300, 600);
+        frame.setSize(1500, 600);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
@@ -79,7 +79,8 @@ public class AirportDatabaseApp {
 
         JPanel group5 = createAlignedGroup("Действия:",
                 createActionButton("Добавить запись", this::showAddRecordDialog),
-                createActionButton("Удалить запись", this::showDeleteRecordDialog)
+                createActionButton("Удалить запись", this::showDeleteRecordDialog),
+                createActionButton("Обновить", e -> refreshData())
         );
 
         // Добавляем группы с отступами
@@ -842,7 +843,7 @@ public class AirportDatabaseApp {
                         salaryField.getText().isEmpty()) {
                     throw new Exception("Все обязательные поля должны быть заполнены");
                 }
-                int nextId = getNextId("Teams", "TeamID");
+                int nextId = getNextId("AirportStaff", "WorkerID");
 
                 String sql = "INSERT INTO AirportStaff VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 try (PreparedStatement stmt = connection.prepareStatement(sql)) {

@@ -49,9 +49,8 @@ public class AirplaneDatabaseApp {
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Группы кнопок с выравниванием
-        JPanel group1 = createAlignedGroup("Основные таблицы:",
+        JPanel group1 = createAlignedGroup("Самолеты:",
                 createTableButton("Самолеты", "Planes"),
-                createTableButton("Типы самолетов", "PlaneTypeCharacteristics"),
                 createTableButton("Пассажирские", "PassengerPlanes"),
                 createTableButton("Грузовые", "CargoPlanes"),
                 createTableButton("Специальные", "SpecialPlanes")
@@ -74,7 +73,8 @@ public class AirplaneDatabaseApp {
 
         JPanel group4 = createAlignedGroup("Действия:",
                 createActionButton("Добавить запись", this::showAddRecordDialog),
-                createActionButton("Удалить запись", this::showDeleteRecordDialog)
+                createActionButton("Удалить запись", this::showDeleteRecordDialog),
+                createActionButton("Обновить", e -> refreshData())
         );
 
         // Добавляем группы с отступами
@@ -472,14 +472,12 @@ public class AirplaneDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Аэропорт");
             model.addColumn("Модель");
             model.addColumn("Тип");
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("PlanesID"),
                         rs.getString("Airport"),
                         rs.getString("ModelName"),
                         rs.getString("PlaneType")
@@ -581,7 +579,6 @@ public class AirplaneDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Модель");
             model.addColumn("Макс. пассажиров");
             model.addColumn("Общая загрузка");
@@ -589,7 +586,6 @@ public class AirplaneDatabaseApp {
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("PlaneID"),
                         rs.getString("ModelName"),
                         rs.getInt("MaxPassangers"),
                         rs.getFloat("AllLoadCapacity"),
@@ -627,7 +623,6 @@ public class AirplaneDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Модель");
             model.addColumn("Макс. загрузка");
             model.addColumn("Макс. объем");
@@ -640,7 +635,6 @@ public class AirplaneDatabaseApp {
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("PlaneID"),
                         rs.getString("ModelName"),
                         rs.getFloat("MaxLoad"),
                         rs.getFloat("MaxVolume"),
@@ -682,7 +676,6 @@ public class AirplaneDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Модель");
             model.addColumn("Тип полета");
             model.addColumn("Клиент");
@@ -692,7 +685,6 @@ public class AirplaneDatabaseApp {
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("PlaneID"),
                         rs.getString("ModelName"),
                         rs.getString("SpecialFlightType"),
                         rs.getString("FlightClient"),
@@ -732,14 +724,12 @@ public class AirplaneDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Модель");
             model.addColumn("Дата проверки");
             model.addColumn("Статус");
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("PlanesID"),
                         rs.getString("ModelName"),
                         rs.getDate("TechCheckUpDate"),
                         rs.getString("Status")
@@ -777,14 +767,12 @@ public class AirplaneDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Модель");
             model.addColumn("Дата ремонта");
             model.addColumn("Статус");
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("PlanesID"),
                         rs.getString("ModelName"),
                         rs.getDate("RepairCheckUpDate"),
                         rs.getString("Status")
@@ -829,7 +817,6 @@ public class AirplaneDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Модель");
             model.addColumn("Дата заправки");
             model.addColumn("Тип топлива");
@@ -837,7 +824,6 @@ public class AirplaneDatabaseApp {
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("PlanesID"),
                         rs.getString("ModelName"),
                         rs.getDate("Date"),
                         rs.getInt("TypeOfOil") == 1 ? "Авиакеросин" : "Другое",
@@ -883,7 +869,6 @@ public class AirplaneDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Модель");
             model.addColumn("Дата поставки");
             model.addColumn("Тип поставки");
@@ -891,7 +876,6 @@ public class AirplaneDatabaseApp {
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("PlanesID"),
                         rs.getString("ModelName"),
                         rs.getDate("Date"),
                         rs.getString("TypeOfSuppling"),
@@ -923,12 +907,10 @@ public class AirplaneDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Статус готовности");
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("StatusID"),
                         rs.getString("StatusName")
                 });
             }
@@ -957,12 +939,10 @@ public class AirplaneDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Статус полета");
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("StatusID"),
                         rs.getString("StatusName")
                 });
             }
@@ -997,14 +977,12 @@ public class AirplaneDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Модель");
             model.addColumn("Статус готовности");
             model.addColumn("Время обновления");
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("PlanesID"),
                         rs.getString("ModelName"),
                         rs.getString("StatusName"),
                         rs.getTimestamp("UpdateTime")
@@ -1041,14 +1019,12 @@ public class AirplaneDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("Модель");
             model.addColumn("Статус полета");
             model.addColumn("Время обновления");
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("PlanesID"),
                         rs.getString("ModelName"),
                         rs.getString("StatusName"),
                         rs.getTimestamp("UpdateTime")

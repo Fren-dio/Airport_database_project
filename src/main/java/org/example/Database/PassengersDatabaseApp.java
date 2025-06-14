@@ -280,7 +280,6 @@ public class PassengersDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("ФИО");
             model.addColumn("Страна");
             model.addColumn("Паспортные данные");
@@ -288,7 +287,6 @@ public class PassengersDatabaseApp {
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("PassengerID"),
                         rs.getString("FIO"),
                         rs.getString("Country"),
                         rs.getString("PassportData"),
@@ -315,13 +313,11 @@ public class PassengersDatabaseApp {
                 }
             };
 
-            model.addColumn("ID");
             model.addColumn("ФИО ребенка");
             model.addColumn("Дата рождения");
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("ChildID"),
                         rs.getString("ChildName"),
                         rs.getDate("ChildBirthDay")
                 });
@@ -350,16 +346,12 @@ public class PassengersDatabaseApp {
                 }
             };
 
-            model.addColumn("ID сотрудника");
             model.addColumn("ФИО сотрудника");
-            model.addColumn("ID ребенка");
             model.addColumn("Имя ребенка");
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("WorkerID"),
                         rs.getString("WorkerName"),
-                        rs.getInt("ChildID"),
                         rs.getString("ChildName")
                 });
             }
@@ -388,10 +380,10 @@ public class PassengersDatabaseApp {
                 }
             };
 
-            model.addColumn("ID билета");
+            model.addColumn("Номер билета");
             model.addColumn("Стоимость");
             model.addColumn("Статус");
-            model.addColumn("ID рейса");
+            model.addColumn("Номер рейса");
             model.addColumn("Место");
             model.addColumn("Макс. вес багажа");
 
@@ -429,7 +421,7 @@ public class PassengersDatabaseApp {
                 }
             };
 
-            model.addColumn("ID билета");
+            model.addColumn("Номер билета");
             model.addColumn("Пассажир");
             model.addColumn("Статус");
             model.addColumn("Время изменения");
@@ -462,7 +454,7 @@ public class PassengersDatabaseApp {
                 }
             };
 
-            model.addColumn("ID рейса");
+            model.addColumn("Номер рейса");
             model.addColumn("Макс. вместимость");
             model.addColumn("Факт. пассажиров");
             model.addColumn("С багажом");
